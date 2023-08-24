@@ -1,0 +1,15 @@
+# Compiled files
+*.s
+*.o
+
+# Static libraries
+*.so
+*.dll
+*.dylib
+
+# Dynamic libraries
+*.a
+*.lib
+
+# OS files
+.DS_Store
