@@ -1,14 +1,13 @@
 objects := main.o split.o
+exec := split
 
-all: $(objects)
-	cc -o split $(objects)
+$(exec): $(objects)
+	cc -o $@ $^
 
-main.o: main.c split.h
-	cc -c main.c
-split.o: split.c split.h
-	cc -c split.c
+.c.o:
+	cc -o $@ -c $<
 
 .PHONY: clean all
 
 clean:
-	rm split $(objects)
+	rm $(exec) $(objects)

@@ -9,5 +9,6 @@ int main(int argc, char *argv[]) {
     char **result = string_split(input, sep, &size);
     printf("%s %s %d\n", input, sep, size);
     printf("%s\n", result[0]);
+	printf("Done\n");
     return 0;
 }
