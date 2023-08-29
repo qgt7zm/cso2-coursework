@@ -11,5 +11,9 @@
 *.a
 *.lib
 
+
+# IDE files
+*.code-workspace
+
 # OS files
 .DS_Store
