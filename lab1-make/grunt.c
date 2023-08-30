@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "say.h"
 
 void accept() {
