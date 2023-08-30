@@ -1,6 +1,7 @@
 # Compiled files
 *.s
 *.o
+*.out
 
 # Static libraries
 *.so
@@ -11,8 +12,8 @@
 *.a
 *.lib
 
-
 # IDE files
+.vscode
 *.code-workspace
 
 # OS files
