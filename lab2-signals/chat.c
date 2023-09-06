@@ -39,14 +39,7 @@ static void handleSignal(int signum) {
 	// Don't care about others
 }
 
-// Objective: Create a signal-base two-user chat program
-// Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
-int main() {
-	pid_t pid = getpid();
-
-	printf("Hello there!\n");
-	printf("Process ID: %d\n", pid);
-
+void setupSignalHandler() {
 	// Create signal handler
 	struct sigaction action;
 	action.sa_handler = handleSignal;
@@ -57,24 +50,67 @@ int main() {
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 	sigaction(SIGUSR1, &action, NULL);
+}
 
-	// Create shared memory
+int getOtherUserPid() {
+	int otherUser;
+	printf("Enter process ID of other user: ");
+	scanf("%d", &otherUser);
+	return otherUser;
+}
+
+void getFilename(char filename[], int pid) {
+	snprintf(filename, filename_size, "/%d-chat", pid);
+}
+
+int getFileDescriptor(char filename[]) {
+	// Get inbox file descriptor
+	int fd = shm_open(filename, O_CREAT | O_RDWR, 0666);
+ 	if (fd < 0) { /* something went wrong */ }
+	ftruncate(fd, inbox_size); // Allocate shared memory space
+	return fd;
+}
+
+void getFileAsString(char file_data[], int fd) {
+	// Convert file descriptor to pointer
+	file_data = mmap(NULL, inbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	munmap(file_data, inbox_size);
+	if (file_data == (char*) MAP_FAILED) { /* something went wrong */ }
+	close(fd); // Deallocate file descriptor, keep pointer
+}
+
+// Objective: Create a signal-base two-user chat program
+// Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
+int main() {
+	pid_t pid = getpid();
+
+	setupSignalHandler();
+
+	printf("Logged in.\n");
+	printf("Process ID: %d\n", pid);
+
+	/* Inbox */
+
 	char inbox_filename[filename_size];
-	snprintf(inbox_filename, filename_size, "/%d-chat", pid);
-	printf("Filename: %s\n", inbox_filename);
+	getFilename(inbox_filename, pid);
+	printf("Inbox filename: %s\n", inbox_filename);
 
-	// Create inbox file descriptor
-	int inbox_fd = shm_open(inbox_filename, O_CREAT | O_RDWR, 0666);
- 	if (inbox_fd < 0) { /* something went wrong */ }
-	ftruncate(inbox_fd, inbox_size);
+	int inbox_fd = getFileDescriptor(inbox_filename);
+	char *inbox_data;
+	getFileAsString(inbox_data, inbox_fd);
 
-	// Attack pointer to inbox
-	char *inbox_data = mmap(NULL, inbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, inbox_fd, 0);
-	munmap(inbox_data, inbox_size);
-	if (inbox_data == (char*) MAP_FAILED) {
-	}
-	close(inbox_fd); // Deallocate inbox
-	munmap(inbox_data, inbox_size);	// Deallocate pointer
+	/* Outbox */
+
+	int otherPid = getOtherUserPid();
+	printf("Other user is %d\n", otherPid);
+
+	char outbox_filename[filename_size];
+	getFilename(outbox_filename, otherPid);
+	printf("Outbox filename: %s\n", outbox_filename);
+
+	int outbox_fd = getFileDescriptor(outbox_filename);
+	char *outbox_data;
+	getFileAsString(inbox_data, outbox_fd);
 
 	// Do some signal stuff
 	kill(getpid(), SIGUSR1);
@@ -82,5 +118,9 @@ int main() {
 	kill(getpid(), SIGTERM);
 
 	// Destroy inbox
-	shm_unlink(inbox_filename);
+	munmap(inbox_data, inbox_size);	// Deallocate pointer
+	shm_unlink(inbox_filename); // Deallocate shared memory under filename
+
+	munmap(outbox_data, inbox_size);
+	shm_unlink(outbox_filename);
 }
