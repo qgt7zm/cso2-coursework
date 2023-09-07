@@ -17,8 +17,7 @@ typedef struct {
 // Chat Helper Methods
 
 int getOtherUserPid();
-void getFilename(char filename[], int pid);
-int getFileDescriptor(char filename[]);
-void getFileAsString(char **file_data, int fd);
+void getContents(mailbox *mb);
+void freeMailbox(mailbox *mb);
 
 #endif

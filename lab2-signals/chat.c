@@ -17,13 +17,13 @@
 mailbox inbox;
 mailbox outbox;
 
-// Mailbox Functions
+// Signal Functions
 
-void displayInbox() {
+void displayMailbox(mailbox mb) {
 	printf("New message: ");
-	fputs(inbox.contents, stdout);
+	fputs(mb.contents, stdout);
 	fflush(stdout);
-	inbox.contents[0] = '\0'; // Clear inbox
+	mb.contents[0] = '\0'; // Clear mailbox
 }
 
 void logoutOtherUser() {
@@ -32,11 +32,8 @@ void logoutOtherUser() {
 }
 
 void logout() {
-	munmap(inbox.contents, MAILBOX_SIZE); // Deallocate pointer
-	shm_unlink(inbox.filename); // Deallocate shared memory under filename
-
-	munmap(outbox.contents, MAILBOX_SIZE);
-	shm_unlink(outbox.filename);
+	freeMailbox(&inbox);
+	freeMailbox(&outbox);
 
 	printf("Logged out.\n");
 	exit(0);
@@ -52,7 +49,7 @@ static void handleSignal(int signum) {
 			logout();
 			break;
 		case SIGUSR1:
-			displayInbox();
+			displayMailbox(inbox);
 			break;
 	}
 }
@@ -86,23 +83,17 @@ int main() {
 	setupSignalHandler();
 
 	/* Set-up Inbox */
-	getFilename(inbox.filename, inbox.pid);
-	int inbox_fd = getFileDescriptor(inbox.filename);
-	getFileAsString(&(inbox.contents), inbox_fd);
+	getContents(&inbox);
 
 	/* Set-up Outbox */
 	outbox.pid = getOtherUserPid();
 	printf("Other User ID: %d\n", outbox.pid);
-	
-	getFilename(outbox.filename, outbox.pid);
-	int outbox_fd = getFileDescriptor(outbox.filename);
-	getFileAsString(&(outbox.contents), inbox_fd);
+	getContents(&outbox);
 
 	/* Chat With Other User */
 	while (1) {
 		// Send message
 		printf("Send a message: ");
-		printf("contents = %s", outbox.contents);
 		char *msg = fgets(outbox.contents, MAILBOX_SIZE, stdin);
 		if (!msg) break; // EOF
 

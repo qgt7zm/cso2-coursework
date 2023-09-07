@@ -23,8 +23,8 @@ int getOtherUserPid() {
 	return other_user;
 }
 
-void getFilename(char filename[], int pid) {
-	snprintf(filename, FILENAME_SIZE, "/%d-chat", pid);
+void getFilename(mailbox *mb) {
+	snprintf(mb->filename, FILENAME_SIZE, "/%d-chat", mb->pid);
 }
 
 int getFileDescriptor(char filename[]) {
@@ -34,9 +34,20 @@ int getFileDescriptor(char filename[]) {
 	return fd;
 }
 
-void getFileAsString(char **file_data, int fd) {
+void getFileAsString(char **file_contents, int fd) {
 	// Attach pointer to file descriptor
-	*file_data = mmap(NULL, MAILBOX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if (*file_data == (char*) MAP_FAILED) { /* something went wrong */ }
+	*file_contents = mmap(NULL, MAILBOX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (*file_contents == (char*) MAP_FAILED) { /* something went wrong */ }
 	close(fd); // Deallocate file descriptor, keep pointer
+}
+
+void getContents(mailbox *mb) {
+	getFilename(mb);
+	int fd = getFileDescriptor(mb->filename);
+	getFileAsString(&(mb->contents), fd);
+}
+
+void freeMailbox(mailbox *mb) {
+	munmap(mb->contents, MAILBOX_SIZE); // Deallocate pointer
+	shm_unlink(mb->filename); // Deallocate shared memory under filename
 }
