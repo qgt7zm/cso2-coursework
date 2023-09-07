@@ -12,27 +12,21 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 	int endIdx = 0;
 
 	while (endIdx < strlen(input)) {
-		// printf("Start: %d\n", startIdx);
-		// printf("Split: %d\n", splitIdx);
-		// printf("Remaining: '%s'\n", input + startIdx);
 		// Find end of token
 		endIdx = startIdx + strcspn(input + startIdx, sep);
 		
 		// Get next token
 		int len = endIdx - startIdx;
-		char token[len + 1];
-		strncpy(token, input + startIdx, len + 1);
-		token[len] = '\0';
-
-		printf("Token: '%s'\n", token);
-		printf("Len: %d\n", len);
+		char *token = calloc(sizeof(char), len + 1);
+		strncpy(token, input + startIdx, len);
+		token[len] = '\0'; // Append null terminator
 
 		startIdx = endIdx + 1;
 
 		// Append token
-		result[*num_words] = "foo";
+		result[*num_words] = token;
 
-		// Resize
+		// Resize array
 		*num_words += 1;
 		result = (char **) realloc(result, *num_words + 1);
 	}
