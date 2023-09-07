@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 600
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,26 +11,29 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-#define _XOPEN_SOURCE 600
-
 // Constants
 const int filename_size = 128;
 const int mailbox_size = 4096;
 
 // Globals
-int otherPid;
+pid_t other_pid;
 char inbox_filename[filename_size];
 char outbox_filename[filename_size];
 char *inbox_data;
 char *outbox_data;
 
+// Signal Functions
+
 void displayInbox() {
 	// Display new messages and clear inbox
 	printf("Displaying inbox:\n");
+	fputs(inbox_data, stdout);
+	fflush(stdout);
+	inbox_data[0] = '\0';
 }
 
 void stopOtherProgram() {
-	kill(otherPid, SIGINT);
+	kill(other_pid, SIGINT);
 	printf("Logged out other user.\n");
 }
 
@@ -44,16 +49,19 @@ void cleanup() {
 }
 
 static void handleSignal(int signum) {
-    if (signum == SIGTERM) { // Kill
-		cleanup();
-	} else if (signum == SIGINT) { // Ctrl-C
+    if (signum == SIGINT) {
+		// Exit both programs on Ctrl-C
 		stopOtherProgram();
 		cleanup();
-	} else if (signum == SIGUSR1) { // User-defined
+	} else if (signum == SIGTERM) {
+		// Called by other program
+		cleanup();
+	} else if (signum == SIGUSR1) {
 		displayInbox();
 	}
-	// Don't care about others
 }
+
+// Main Helper Functions
 
 void setupSignalHandler() {
 	// Create signal handler
@@ -92,14 +100,6 @@ int getFileDescriptor(char filename[]) {
 	return fd;
 }
 
-void getFileAsString(char file_data[], int fd) {
-	// Convert file descriptor to pointer
-	file_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	munmap(file_data, mailbox_size);
-	if (file_data == (char*) MAP_FAILED) { /* something went wrong */ }
-	close(fd); // Deallocate file descriptor, keep pointer
-}
-
 // Objective: Create a signal-base two-user chat program
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
 int main() {
@@ -115,28 +115,41 @@ int main() {
 	getFilename(inbox_filename, pid);
 
 	int inbox_fd = getFileDescriptor(inbox_filename);
-	getFileAsString(inbox_data, inbox_fd);
+	// Convert file descriptor to pointer
+	inbox_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, inbox_fd, 0);
+	if (inbox_data == (char*) MAP_FAILED) { /* something went wrong */ }
+	close(inbox_fd); // Deallocate file descriptor, keep pointer
 
 	/* Outbox */
 
-	otherPid = getOtherUserPid();
-	printf("Other user is %d\n", otherPid);
-	getFilename(outbox_filename, otherPid);
+	other_pid = getOtherUserPid();
+	printf("Other User ID: %d\n", other_pid);
+	getFilename(outbox_filename, other_pid);
 
 	int outbox_fd = getFileDescriptor(outbox_filename);
-	getFileAsString(inbox_data, outbox_fd);
+	outbox_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, outbox_fd, 0);
+	if (outbox_data == (char*) MAP_FAILED) {}
+	close(outbox_fd);
 
-	int input_size = 256;
+	int input_size = 512;
 	char input_data[input_size];
 
-	while (1) {
-		char *line = fgets(input_data, input_size, stdin);
-		if (!line) break; // EOF
-		printf("input = %s", line);
-	}
+	printf("inbox = '%s'\n", inbox_data);
+	printf("outbox = '%s'\n", outbox_data);
 
-	// Do some signal stuff
-	kill(getpid(), SIGUSR1);
+	while (1) {
+		// Send message
+		printf("Type a message to send: ");
+		char *msg = fgets(outbox_data, mailbox_size, stdin);
+		if (!msg) break; // EOF
+		printf("Sent message = %s", msg);
+
+		// Wait until received
+		while(outbox_data[0]) { usleep(10000); }
+		printf("Message received.\n");
+
+		kill(getpid(), SIGUSR1); // Display inbox
+	}
 
 	// Destroy
 	cleanup();
