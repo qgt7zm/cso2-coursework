@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <signal.h>
 #include <unistd.h>
@@ -10,29 +11,41 @@
 #include "chat.h"
 
 const int filename_size = 128;
-const int inbox_size = 4096;
+const int mailbox_size = 4096;
+
+int otherPid;
+char inbox_filename[filename_size];
+char outbox_filename[filename_size];
+char *inbox_data;
+char *outbox_data;
 
 void displayInbox() {
 	// Display new messages and clear inbox
-	printf("Display inbox\n");
+	printf("Displaying inbox:\n");
 }
 
 void stopOtherProgram() {
-	// Kill other program
-	printf("Stop other program\n");
+	kill(otherPid, SIGINT);
+	printf("Logged out other user.\n");
 }
 
 void cleanup() {
-	// Free inbox/outbox
-	printf("Cleanup\n");
+	munmap(inbox_data, mailbox_size);	// Deallocate pointer
+	shm_unlink(inbox_filename); // Deallocate shared memory under filename
+
+	munmap(outbox_data, mailbox_size);
+	shm_unlink(outbox_filename);
+
+	printf("Logged out.\n");
+	exit(0);
 }
 
 static void handleSignal(int signum) {
     if (signum == SIGTERM) { // Kill
 		cleanup();
 	} else if (signum == SIGINT) { // Ctrl-C
-		cleanup();
 		stopOtherProgram();
+		cleanup();
 	} else if (signum == SIGUSR1) { // User-defined
 		displayInbox();
 	}
@@ -53,9 +66,14 @@ void setupSignalHandler() {
 }
 
 int getOtherUserPid() {
-	int otherUser;
 	printf("Enter process ID of other user: ");
-	scanf("%d", &otherUser);
+
+	int size = 64;
+	char input[size];
+	fgets(input, size, stdin); // Use fgets to avoid unflushed stdin
+
+	int otherUser = 0;
+	sscanf(input, "%d\n", &otherUser); // Scan int from input string
 	return otherUser;
 }
 
@@ -67,14 +85,14 @@ int getFileDescriptor(char filename[]) {
 	// Get inbox file descriptor
 	int fd = shm_open(filename, O_CREAT | O_RDWR, 0666);
  	if (fd < 0) { /* something went wrong */ }
-	ftruncate(fd, inbox_size); // Allocate shared memory space
+	ftruncate(fd, mailbox_size); // Allocate shared memory space
 	return fd;
 }
 
 void getFileAsString(char file_data[], int fd) {
 	// Convert file descriptor to pointer
-	file_data = mmap(NULL, inbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	munmap(file_data, inbox_size);
+	file_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	munmap(file_data, mailbox_size);
 	if (file_data == (char*) MAP_FAILED) { /* something went wrong */ }
 	close(fd); // Deallocate file descriptor, keep pointer
 }
@@ -91,36 +109,32 @@ int main() {
 
 	/* Inbox */
 
-	char inbox_filename[filename_size];
 	getFilename(inbox_filename, pid);
-	printf("Inbox filename: %s\n", inbox_filename);
 
 	int inbox_fd = getFileDescriptor(inbox_filename);
-	char *inbox_data;
 	getFileAsString(inbox_data, inbox_fd);
 
 	/* Outbox */
 
-	int otherPid = getOtherUserPid();
+	otherPid = getOtherUserPid();
 	printf("Other user is %d\n", otherPid);
-
-	char outbox_filename[filename_size];
 	getFilename(outbox_filename, otherPid);
-	printf("Outbox filename: %s\n", outbox_filename);
 
 	int outbox_fd = getFileDescriptor(outbox_filename);
-	char *outbox_data;
 	getFileAsString(inbox_data, outbox_fd);
+
+	int input_size = 256;
+	char input_data[input_size];
+
+	while (1) {
+		char *line = fgets(input_data, input_size, stdin);
+		if (!line) break; // EOF
+		printf("input = %s", line);
+	}
 
 	// Do some signal stuff
 	kill(getpid(), SIGUSR1);
-	kill(getpid(), SIGINT);
-	kill(getpid(), SIGTERM);
 
-	// Destroy inbox
-	munmap(inbox_data, inbox_size);	// Deallocate pointer
-	shm_unlink(inbox_filename); // Deallocate shared memory under filename
-
-	munmap(outbox_data, inbox_size);
-	shm_unlink(outbox_filename);
+	// Destroy
+	cleanup();
 }
