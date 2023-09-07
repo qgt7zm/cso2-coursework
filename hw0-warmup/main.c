@@ -4,10 +4,10 @@
 
 #include "split.h"
 
-// TODO this should be on stack
-char *getSep(int argc, char *argv[]) {
+char *get_sep(int argc, char *argv[]) {
 	const int minIdx = 1;
 
+	// Return whitespace by default
 	if (argc == minIdx) {
 		char *sep = calloc(sizeof(char), 2 + 1);
 		strcpy(sep, " \t");
@@ -31,7 +31,7 @@ char *getSep(int argc, char *argv[]) {
 }
 
 void test_sep(char *expected, int argc, char *argv[]) {
-	char *result = getSep(argc, argv);
+	char *result = get_sep(argc, argv);
 	if (strcmp(expected, result) == 0) {
 		printf("Test passed\n");
 	} else {
@@ -41,31 +41,40 @@ void test_sep(char *expected, int argc, char *argv[]) {
 }
 
 void test() {
-	char* argv0[] = {"split"};
-	test_sep(" \t", 1, argv0);
+	// Test the getSep() function
+	char* sep0[] = {"split"};
+	test_sep(" \t", 1, sep0);
 
-	char* argv1[] = {"split", "abc"};
-	test_sep("abc", 2, argv1);
+	char* sep1[] = {"split", "abc"};
+	test_sep("abc", 2, sep1);
 
-	char* argv2[] = {"split", "ab", "c"};
-	test_sep("abc", 3, argv2);
+	char* sep2[] = {"split", "ab", "c"};
+	test_sep("abc", 3, sep2);
 
-	char* argv3[] = {"split", "a", "b", "c"};
-	test_sep("abc", 4, argv3);
+	char* sep3[] = {"split", "a", "b", "c"};
+	test_sep("abc", 4, sep3);
 }	
 
 int main(int argc, char *argv[]) {
+	// test();
+
     const char *input = "Computer Systems and Organization 2";
-	test();
+	char *sep = get_sep(argc, argv);
+    int size;
 
-    // char *sep = getSep(argc, argv);
-    // int size;
-    // char **result = string_split(input, sep, &size);
-    // printf("Input: %s\n", input);
-	// printf("Sep: %s\n", sep);
-	// printf("Size: %d\n", size);
-    // printf("Result: %s\n", result[0]);
+	printf("Input: %s\n", input);
+	printf("Sep: '%s'\n", sep);
 
-	// free(sep);
+    char **result = string_split(input, sep, &size);
+
+	printf("Size: %d\n", size);
+    printf("Result: ");
+	for (int i = 0; i < size; i++) {
+		printf("[%s]", result[i]);
+	}
+	printf("\n");
+
+	free(sep);
+	free(result);
     return 0;
 }
