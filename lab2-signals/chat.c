@@ -14,32 +14,29 @@
 #include "chat.h"
 
 // Globals
-pid_t other_pid;
-char inbox_filename[FILENAME_SIZE];
-char outbox_filename[FILENAME_SIZE];
-char *inbox_data;
-char *outbox_data;
+mailbox inbox;
+mailbox outbox;
 
-// Signal Functions
+// Mailbox Functions
 
 void displayInbox() {
 	printf("New message: ");
-	fputs(inbox_data, stdout);
+	fputs(inbox.contents, stdout);
 	fflush(stdout);
-	inbox_data[0] = '\0'; // Clear inbox
+	inbox.contents[0] = '\0'; // Clear inbox
 }
 
 void logoutOtherUser() {
-	kill(other_pid, SIGINT);
+	kill(outbox.pid, SIGINT);
 	printf("Logged out other user.\n");
 }
 
 void logout() {
-	munmap(inbox_data, MAILBOX_SIZE); // Deallocate pointer
-	shm_unlink(inbox_filename); // Deallocate shared memory under filename
+	munmap(inbox.contents, MAILBOX_SIZE); // Deallocate pointer
+	shm_unlink(inbox.filename); // Deallocate shared memory under filename
 
-	munmap(outbox_data, MAILBOX_SIZE);
-	shm_unlink(outbox_filename);
+	munmap(outbox.contents, MAILBOX_SIZE);
+	shm_unlink(outbox.filename);
 
 	printf("Logged out.\n");
 	exit(0);
@@ -85,33 +82,34 @@ void setupSignalHandler() {
 // Objective: Create a signal-base two-user chat program
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
 int main() {
-	pid_t pid = loginUser();
+	inbox.pid = loginUser();
 	setupSignalHandler();
 
 	/* Set-up Inbox */
-	getFilename(inbox_filename, pid);
-	int inbox_fd = getFileDescriptor(inbox_filename);
-	getFileAsString(&inbox_data, inbox_fd);
+	getFilename(inbox.filename, inbox.pid);
+	int inbox_fd = getFileDescriptor(inbox.filename);
+	getFileAsString(&(inbox.contents), inbox_fd);
 
 	/* Set-up Outbox */
-	other_pid = getOtherUserPid();
-	printf("Other User ID: %d\n", other_pid);
-	getFilename(outbox_filename, other_pid);
-
-	int outbox_fd = getFileDescriptor(outbox_filename);
-	getFileAsString(&outbox_data, outbox_fd);
+	outbox.pid = getOtherUserPid();
+	printf("Other User ID: %d\n", outbox.pid);
+	
+	getFilename(outbox.filename, outbox.pid);
+	int outbox_fd = getFileDescriptor(outbox.filename);
+	getFileAsString(&(outbox.contents), inbox_fd);
 
 	/* Chat With Other User */
 	while (1) {
 		// Send message
 		printf("Send a message: ");
-		char *msg = fgets(outbox_data, MAILBOX_SIZE, stdin);
+		printf("contents = %s", outbox.contents);
+		char *msg = fgets(outbox.contents, MAILBOX_SIZE, stdin);
 		if (!msg) break; // EOF
 
-		kill(other_pid, SIGUSR1); // Notify other user
+		kill(outbox.pid, SIGUSR1); // Notify other user
 
 		// Wait until received
-		while(outbox_data[0]) { usleep(10000); }
+		while(outbox.contents[0]) { usleep(10000); }
 		printf("Message received.\n");
 	}
 

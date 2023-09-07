@@ -1,11 +1,7 @@
 #define _XOPEN_SOURCE 600
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-
-// Signals
-#include <signal.h>
 
 // Shared Memory
 #include <sys/mman.h>
