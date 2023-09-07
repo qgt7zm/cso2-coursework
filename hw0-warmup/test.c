@@ -17,17 +17,23 @@ void test_sep(char expected[], int argc, char *argv[]) {
 void test_split(char *expected_results[], int expected_size, const char *input, const char *sep) {
 	int size;
 	char **results = string_split(input, sep, &size);
-	if (expected_size == size) {
-		printf("Test passed\n");
-	} else {
+
+	int passed = 1;
+	if (expected_size != size) {
+		passed = 0;
 		printf("Test failed; expected %d tokens but found %d\n", expected_size, size);
-		for (int i = 0; i < expected_size && i < size; i++) {
-			if (strcmp(expected_results[i], results[i]) != 0) {
-				printf("> Expected token '%s' but found '%s' at position %d\n",
-					expected_results[i], results[i], i);
-			}
+	}
+	for (int i = 0; i < expected_size && i < size; i++) {
+		if (strcmp(expected_results[i], results[i]) != 0) {
+			printf("> Expected token '%s' but found '%s' at position %d\n",
+				expected_results[i], results[i], i);
+			passed = 0;
 		}
 	}
+	if (passed) {
+		printf("Test passed\n");
+	}
+
 	free(results);
 }
 
@@ -46,6 +52,7 @@ int main() {
 	test_sep("abc", 4, sep3);
 
 	/* Test the string_split() function */
+	// Failing
 	char *results1[] = {"Computer", "Systems", "and", "Organization", "2"};
 	test_split(results1, 5, "Computer Systems and Organization 2", " ");
 
@@ -66,15 +73,15 @@ int main() {
 	char *results5[] = {"foo", "bar", "baz"};
 	test_split(results5, 3, "foo\t bar   baz", " \t");
 
-	char *results6[] = {"quuz-no-space", "quux-with", "space", "!"};
+	char *results6[] = {"quux-no-space", "quux-with", "space", "!"};
 	test_split(results6, 4, "quux-no-space quux-with space !", " \t");
 
 	char *results7[] = {"", "indented"};
 	test_split(results7, 2, "\tindented", " \t");
 
-	// Segfault
-	// char *results8[] = {"foo", "bar", "baz", ""};
-	// test_split(results8, 4, "fooXXXXbarZXYXYXZbazYYYYY", "XYZ");
+	// Failing
+	char *results8[] = {"foo", "bar", "baz", ""};
+	test_split(results8, 4, "fooXXXXbarZXYXYXZbazYYYYY", "XYZ");
 
 	// Failing
 	char *results9[] = {"", ""};

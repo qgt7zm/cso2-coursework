@@ -7,7 +7,7 @@
 // TODO too many blank strings if adjacent tokens
 char **string_split(const char *input, const char *sep, int *num_words) {
 	*num_words = 0;
-	char **result = (char **) calloc(sizeof(char *), *num_words + 1);
+	char **result = calloc(sizeof(char *), *num_words + 1);
 
 	int startIdx = 0;
 	int endIdx = 0;
@@ -25,24 +25,16 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 		// Find end of token
 		endIdx = startIdx + span;
 		
-		// Get next token
+		// Append next token
 		int len = endIdx - startIdx;
-		char *token = calloc(sizeof(char), len + 1);
-		strncpy(token, input + startIdx, len);
-		token[len] = '\0'; // Append null terminator
-
-		// Update indices
-		startIdx = endIdx + 1;
-
-		// Append token
-		result[*num_words] = token;
-		// printf("[%s]", result[*num_words]);
+		result[*num_words] = strndup(input + startIdx, len);
 
 		// Resize array
 		*num_words += 1;
-		result = (char **) realloc(result, *num_words + 1);
+		result = realloc(result, sizeof(char*) * (*num_words + 1));
+		startIdx = endIdx + 1;
 	}
-
+	
 	return result;
 }
 
@@ -59,7 +51,7 @@ char *get_sep(int argc, char *argv[]) {
 	// Create string
 	int sepLen = 0;
 	int curIdx = sepLen;
-	char *sep = (char *) calloc(sizeof(char), sepLen + 1);
+	char *sep = calloc(sizeof(char), sepLen + 1);
 
 	for (int i = minIdx; i < argc; i++) {
 		// Grow string

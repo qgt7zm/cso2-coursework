@@ -13,7 +13,7 @@ test: test.o split.o
 .PHONY: clean all check
 
 check:
-	cc -Og -g -std=c11 -Wall -pedantic -o split main.c split.c -fsanitize=address
+	gcc -Wall -pedantic -std=c11 -Og -g -fsanitize=address main.c split.c -o $(exec)
 
 clean:
 	rm -r $(exec) test *.o split.dSYM
