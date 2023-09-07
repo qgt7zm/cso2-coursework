@@ -14,6 +14,13 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 	while (endIdx < strlen(input)) {
 		int span = strcspn(input + startIdx, sep);
 
+		// if (span == 0) {
+		// 	// Only found token
+		// 	startIdx += 1;
+		// 	endIdx += 1;
+		// 	continue;
+		// }
+
 		// Find end of token
 		endIdx = startIdx + span;
 		

@@ -1,2 +1,5 @@
 # Executable files
 split
+
+# Code analysis files
+split.dSYM

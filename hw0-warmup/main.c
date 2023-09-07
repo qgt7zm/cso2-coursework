@@ -111,26 +111,38 @@ void test() {
 }	
 
 int main(int argc, char *argv[]) {
-	test();
-	exit(0);
+	// test();
+	// exit(0);
 
-    const char *input = "Big stinky poopoo butt";
 	char *sep = get_sep(argc, argv);
-    int size;
-
-	printf("Input: %s\n", input);
 	printf("Sep: '%s'\n", sep);
 
-    char **result = string_split(input, sep, &size);
+	char buffer[INPUT_SIZE];
+	while(1) {
+		// Get user input
+		char *input = fgets(buffer, INPUT_SIZE, stdin);
+		if (!input || strcmp(input, ".") == 0) {
+			break;
+		}
 
-	printf("Size: %d\n", size);
-    printf("Result: ");
-	for (int i = 0; i < size; i++) {
-		printf("[%s]", result[i]);
-	}
-	printf("\n");
+		// Prune newline
+		int len = strlen(input);
+		input[len - 1] = '\0';
+
+		printf("Input: '%s'\n", input);
+
+		int size;
+		char **result = string_split(input, sep, &size);
+
+		printf("Size: %d\n", size);
+		printf("Result: ");
+		for (int i = 0; i < size; i++) {
+			printf("[%s]", result[i]);
+		}
+		printf("\n");
+		free(result);
+	}	
 
 	free(sep);
-	free(result);
     return 0;
 }
