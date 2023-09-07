@@ -4,30 +4,9 @@
 
 #include "split.h"
 
-char *get_sep(int argc, char *argv[]) {
-	const int minIdx = 1;
-
-	// Return whitespace by default
-	if (argc == minIdx) {
-		char *sep = calloc(sizeof(char), 2 + 1);
-		strcpy(sep, " \t");
-		return sep;
-	}
-
-	// Create string
-	int sepLen = 0;
-	int curIdx = sepLen;
-	char *sep = calloc(sizeof(char), sepLen + 1);
-
-	for (int i = minIdx; i < argc; i++) {
-		// Grow string
-		sepLen += strlen(argv[i]);
-		sep = (char *) realloc(sep, sepLen + 1);
-		// Concatenate next arg
-		strcpy(sep + curIdx, argv[i]);
-		curIdx = sepLen;
-	}
-	return sep;
+void pruneNewLine(char *str) {
+	int len = strlen(str);
+	if (str[len - 1] == '\n') str[len - 1] = '\0';
 }
 
 // Objective: Create a program that splits strings along a given delineator
@@ -39,21 +18,15 @@ int main(int argc, char *argv[]) {
 	while(1) {
 		// Get user input
 		char *input = fgets(buffer, INPUT_SIZE, stdin);
-
 		if (!input) break;
 
-		// Prune newline
-		int len = strlen(input);
-		if (input[len - 1] == '\n') input[len - 1] = '\0';
+		pruneNewLine(input);
+		if (strcmp(input, ".") == 0) break; // Stop if period
 
-		if (strcmp(input, ".") == 0) {
-			break; // Stop if period
-		}
-
+		// Display results
 		int size;
 		char **result = string_split(input, sep, &size);
 
-		// Display results
 		for (int i = 0; i < size; i++) {
 			printf("[%s]", result[i]);
 			free(result[i]); // Free results while printing

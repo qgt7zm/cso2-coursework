@@ -4,32 +4,6 @@
 
 #include "split.h"
 
-char *get_sep(int argc, char *argv[]) {
-	const int minIdx = 1;
-
-	// Return whitespace by default
-	if (argc == minIdx) {
-		char *sep = calloc(sizeof(char), 2 + 1);
-		strcpy(sep, " \t");
-		return sep;
-	}
-
-	// Create string
-	int sepLen = 0;
-	int curIdx = sepLen;
-	char *sep = calloc(sizeof(char), sepLen + 1);
-
-	for (int i = minIdx; i < argc; i++) {
-		// Grow string
-		sepLen += strlen(argv[i]);
-		sep = (char *) realloc(sep, sepLen + 1);
-		// Concatenate next arg
-		strcpy(sep + curIdx, argv[i]);
-		curIdx = sepLen;
-	}
-	return sep;
-}
-
 void test_sep(char expected[], int argc, char *argv[]) {
 	char *result = get_sep(argc, argv);
 	if (strcmp(expected, result) == 0) {
