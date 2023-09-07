@@ -30,6 +30,8 @@ char *get_sep(int argc, char *argv[]) {
 	return sep;
 }
 
+// Objective: Create a program that splits strings along a given delineator
+// Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/warmup.html
 int main(int argc, char *argv[]) {
 	char *sep = get_sep(argc, argv);
 
@@ -45,17 +47,19 @@ int main(int argc, char *argv[]) {
 		if (input[len - 1] == '\n') input[len - 1] = '\0';
 
 		if (strcmp(input, ".") == 0) {
-			// Stop if period
-			break;
+			break; // Stop if period
 		}
 
 		int size;
 		char **result = string_split(input, sep, &size);
 
+		// Display results
 		for (int i = 0; i < size; i++) {
 			printf("[%s]", result[i]);
+			free(result[i]); // Free results while printing
 		}
 		printf("\n");
+
 		free(result);
 	}
 
