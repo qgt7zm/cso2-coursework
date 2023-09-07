@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <signal.h>
 #include <unistd.h>
 
+// Signals
+#include <signal.h>
+
+// Shared Memory
 #include <sys/mman.h>
 #include <fcntl.h>
+
 #define _XOPEN_SOURCE 600
 
-#include "chat.h"
-
+// Constants
 const int filename_size = 128;
 const int mailbox_size = 4096;
 
+// Globals
 int otherPid;
 char inbox_filename[filename_size];
 char outbox_filename[filename_size];
