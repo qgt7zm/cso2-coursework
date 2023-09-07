@@ -25,7 +25,7 @@ char *outbox_data;
 // Signal Functions
 
 void displayInbox() {
-	printf("New message: ");
+	// printf("New message: ");
 	fputs(inbox_data, stdout);
 	fflush(stdout);
 	inbox_data[0] = '\0'; // Clear inbox
@@ -48,16 +48,17 @@ void logout() {
 }
 
 static void handleSignal(int signum) {
-    if (signum == SIGINT) {
-		// Exit both users with Ctrl-C
-		logoutOtherUser();
-		logout();
-	} else if (signum == SIGTERM) {
-		// Called by other program
-		logout();
-	} else if (signum == SIGUSR1) {
-		// User-defined signal
-		displayInbox();
+	switch(signum) {
+		case SIGINT:
+			// Exit both users with Ctrl-C
+			logoutOtherUser();
+		case SIGTERM:
+			// Called by other program
+			logout();
+			break;
+		case SIGUSR1:
+			displayInbox();
+			break;
 	}
 }
 
@@ -132,7 +133,7 @@ int main() {
 	/* Chat With Other User */
 	while (1) {
 		// Send message
-		printf("Send a message: ");
+		// printf("Send a message: ");
 		char *msg = fgets(outbox_data, MAILBOX_SIZE, stdin);
 		if (!msg) break; // EOF
 
@@ -140,7 +141,7 @@ int main() {
 
 		// Wait until received
 		while(outbox_data[0]) { usleep(10000); }
-		printf("Message received.\n");
+		// printf("Message received.\n");
 	}
 
 	logout();
