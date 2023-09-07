@@ -11,9 +11,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-// Constants
-#define FILENAME_SIZE 128
-#define MAILBOX_SIZE 4096
+#include "chat.h"
 
 // Globals
 pid_t other_pid;
@@ -25,7 +23,7 @@ char *outbox_data;
 // Signal Functions
 
 void displayInbox() {
-	// printf("New message: ");
+	printf("New message: ");
 	fputs(inbox_data, stdout);
 	fflush(stdout);
 	inbox_data[0] = '\0'; // Clear inbox
@@ -64,6 +62,13 @@ static void handleSignal(int signum) {
 
 // Main Helper Functions
 
+pid_t loginUser() {
+	pid_t pid = getpid();
+	printf("Logged in.\n");
+	printf("Process ID: %d\n", pid);
+	return pid;
+}
+
 void setupSignalHandler() {
 	// Create signal handler
 	struct sigaction action;
@@ -77,47 +82,13 @@ void setupSignalHandler() {
 	sigaction(SIGUSR1, &action, NULL);
 }
 
-int getOtherUserPid() {
-	printf("Enter process ID of other user: ");
-
-	int size = 64;
-	char input[size];
-	fgets(input, size, stdin); // Use fgets() to avoid unflushed stdin
-
-	int other_user = 0;
-	sscanf(input, "%d\n", &other_user); // Scan int from input string
-	return other_user;
-}
-
-void getFilename(char filename[], int pid) {
-	snprintf(filename, FILENAME_SIZE, "/%d-chat", pid);
-}
-
-int getFileDescriptor(char filename[]) {
-	// Get file descriptor
-	int fd = shm_open(filename, O_CREAT | O_RDWR, 0666);
- 	if (fd < 0) { /* something went wrong */ }
-	ftruncate(fd, MAILBOX_SIZE); // Allocate shared memory space
-	return fd;
-}
-
-void getFileAsString(char **file_data, int fd) {
-	// Attach pointer to file descriptor
-	*file_data = mmap(NULL, MAILBOX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if (*file_data == (char*) MAP_FAILED) { /* something went wrong */ }
-	close(fd); // Deallocate file descriptor, keep pointer
-}
-
 // Objective: Create a signal-base two-user chat program
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
 int main() {
-	pid_t pid = getpid();
-	printf("Logged in.\n");
-	printf("Process ID: %d\n", pid);
-
+	pid_t pid = loginUser();
 	setupSignalHandler();
 
-	/* Seu-up Inbox */
+	/* Set-up Inbox */
 	getFilename(inbox_filename, pid);
 	int inbox_fd = getFileDescriptor(inbox_filename);
 	getFileAsString(&inbox_data, inbox_fd);
@@ -133,7 +104,7 @@ int main() {
 	/* Chat With Other User */
 	while (1) {
 		// Send message
-		// printf("Send a message: ");
+		printf("Send a message: ");
 		char *msg = fgets(outbox_data, MAILBOX_SIZE, stdin);
 		if (!msg) break; // EOF
 
@@ -141,7 +112,7 @@ int main() {
 
 		// Wait until received
 		while(outbox_data[0]) { usleep(10000); }
-		// printf("Message received.\n");
+		printf("Message received.\n");
 	}
 
 	logout();
