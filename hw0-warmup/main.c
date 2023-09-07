@@ -4,32 +4,6 @@
 
 #include "split.h"
 
-char *get_sep(int argc, char *argv[]) {
-	const int minIdx = 1;
-
-	// Return whitespace by default
-	if (argc == minIdx) {
-		char *sep = calloc(sizeof(char), 2 + 1);
-		strcpy(sep, " \t");
-		return sep;
-	}
-
-	// Create string
-	int sepLen = 0;
-	int curIdx = sepLen;
-	char *sep = (char *) calloc(sizeof(char), sepLen + 1);
-
-	for (int i = minIdx; i < argc; i++) {
-		// Grow string
-		sepLen += strlen(argv[i]);
-		sep = (char *) realloc(sep, sepLen + 1);
-		// Concatenate next arg
-		strcpy(sep + curIdx, argv[i]);
-		curIdx = sepLen;
-	}
-	return sep;
-}
-
 void test_sep(char expected[], int argc, char *argv[]) {
 	char *result = get_sep(argc, argv);
 	if (strcmp(expected, result) == 0) {
@@ -115,33 +89,37 @@ int main(int argc, char *argv[]) {
 	// exit(0);
 
 	char *sep = get_sep(argc, argv);
-	printf("Sep: '%s'\n", sep);
+	// printf("Sep: '%s'\n", sep);
 
 	char buffer[INPUT_SIZE];
 	while(1) {
 		// Get user input
 		char *input = fgets(buffer, INPUT_SIZE, stdin);
-		if (!input || strcmp(input, ".") == 0) {
-			break;
-		}
+		if (!input) break;
 
 		// Prune newline
 		int len = strlen(input);
 		input[len - 1] = '\0';
 
-		printf("Input: '%s'\n", input);
+		if (strcmp(input, ".") == 0) {
+			// Stop if period
+			break;
+		}
+
+		// printf("Input: '%s'\n", input);
 
 		int size;
 		char **result = string_split(input, sep, &size);
 
-		printf("Size: %d\n", size);
-		printf("Result: ");
+		// printf("Size: %d\n", size);
+		// printf("Result: ");
+		// TODO sometimes giving garbage on first token
 		for (int i = 0; i < size; i++) {
 			printf("[%s]", result[i]);
 		}
 		printf("\n");
 		free(result);
-	}	
+	}
 
 	free(sep);
     return 0;

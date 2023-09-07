@@ -4,6 +4,7 @@
 
 #include "split.h"
 
+// TODO too many blank strings if adjacent tokens
 char **string_split(const char *input, const char *sep, int *num_words) {
 	*num_words = 0;
 	char **result = (char **) calloc(sizeof(char *), *num_words + 1);
@@ -35,6 +36,7 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 
 		// Append token
 		result[*num_words] = token;
+		// printf("[%s]", result[*num_words]);
 
 		// Resize array
 		*num_words += 1;
@@ -42,4 +44,30 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 	}
 
 	return result;
+}
+
+char *get_sep(int argc, char *argv[]) {
+	const int minIdx = 1;
+
+	// Return whitespace by default
+	if (argc == minIdx) {
+		char *sep = calloc(sizeof(char), 2 + 1);
+		strcpy(sep, " \t");
+		return sep;
+	}
+
+	// Create string
+	int sepLen = 0;
+	int curIdx = sepLen;
+	char *sep = (char *) calloc(sizeof(char), sepLen + 1);
+
+	for (int i = minIdx; i < argc; i++) {
+		// Grow string
+		sepLen += strlen(argv[i]);
+		sep = (char *) realloc(sep, sepLen + 1);
+		// Concatenate next arg
+		strcpy(sep + curIdx, argv[i]);
+		curIdx = sepLen;
+	}
+	return sep;
 }
