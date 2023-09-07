@@ -12,13 +12,13 @@
 #include <fcntl.h>
 
 // Constants
-const int filename_size = 128;
-const int mailbox_size = 4096;
+#define FILENAME_SIZE 128
+#define MAILBOX_SIZE 4096
 
 // Globals
 pid_t other_pid;
-char inbox_filename[filename_size];
-char outbox_filename[filename_size];
+char inbox_filename[FILENAME_SIZE];
+char outbox_filename[FILENAME_SIZE];
 char *inbox_data;
 char *outbox_data;
 
@@ -37,10 +37,10 @@ void logoutOtherUser() {
 }
 
 void logout() {
-	munmap(inbox_data, mailbox_size); // Deallocate pointer
+	munmap(inbox_data, MAILBOX_SIZE); // Deallocate pointer
 	shm_unlink(inbox_filename); // Deallocate shared memory under filename
 
-	munmap(outbox_data, mailbox_size);
+	munmap(outbox_data, MAILBOX_SIZE);
 	shm_unlink(outbox_filename);
 
 	printf("Logged out.\n");
@@ -89,20 +89,20 @@ int getOtherUserPid() {
 }
 
 void getFilename(char filename[], int pid) {
-	snprintf(filename, filename_size, "/%d-chat", pid);
+	snprintf(filename, FILENAME_SIZE, "/%d-chat", pid);
 }
 
 int getFileDescriptor(char filename[]) {
 	// Get file descriptor
 	int fd = shm_open(filename, O_CREAT | O_RDWR, 0666);
  	if (fd < 0) { /* something went wrong */ }
-	ftruncate(fd, mailbox_size); // Allocate shared memory space
+	ftruncate(fd, MAILBOX_SIZE); // Allocate shared memory space
 	return fd;
 }
 
 void getFileAsString(char **file_data, int fd) {
 	// Attach pointer to file descriptor
-	*file_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	*file_data = mmap(NULL, MAILBOX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (*file_data == (char*) MAP_FAILED) { /* something went wrong */ }
 	close(fd); // Deallocate file descriptor, keep pointer
 }
@@ -116,7 +116,7 @@ int main() {
 
 	setupSignalHandler();
 
-	/* Set-up Inbox */
+	/* Seu-up Inbox */
 	getFilename(inbox_filename, pid);
 	int inbox_fd = getFileDescriptor(inbox_filename);
 	getFileAsString(&inbox_data, inbox_fd);
@@ -133,7 +133,7 @@ int main() {
 	while (1) {
 		// Send message
 		printf("Send a message: ");
-		char *msg = fgets(outbox_data, mailbox_size, stdin);
+		char *msg = fgets(outbox_data, MAILBOX_SIZE, stdin);
 		if (!msg) break; // EOF
 
 		kill(other_pid, SIGUSR1); // Notify other user
