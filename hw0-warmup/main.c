@@ -4,17 +4,40 @@
 
 #include "split.h"
 
-int main(int argc, char *argv[]) {
-	// test();
-	// exit(0);
+char *get_sep(int argc, char *argv[]) {
+	const int minIdx = 1;
 
+	// Return whitespace by default
+	if (argc == minIdx) {
+		char *sep = calloc(sizeof(char), 2 + 1);
+		strcpy(sep, " \t");
+		return sep;
+	}
+
+	// Create string
+	int sepLen = 0;
+	int curIdx = sepLen;
+	char *sep = calloc(sizeof(char), sepLen + 1);
+
+	for (int i = minIdx; i < argc; i++) {
+		// Grow string
+		sepLen += strlen(argv[i]);
+		sep = (char *) realloc(sep, sepLen + 1);
+		// Concatenate next arg
+		strcpy(sep + curIdx, argv[i]);
+		curIdx = sepLen;
+	}
+	return sep;
+}
+
+int main(int argc, char *argv[]) {
 	char *sep = get_sep(argc, argv);
-	// printf("Sep: '%s'\n", sep);
 
 	char buffer[INPUT_SIZE + 1];
 	while(1) {
 		// Get user input
 		char *input = fgets(buffer, INPUT_SIZE, stdin);
+
 		if (!input) break;
 
 		// Prune newline
@@ -34,8 +57,6 @@ int main(int argc, char *argv[]) {
 		}
 		printf("\n");
 		free(result);
-
-		// break;
 	}
 
 	free(sep);
