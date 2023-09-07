@@ -78,7 +78,6 @@ int main() {
 	test_sep("abc", 4, sep3);
 
 	/* Test the string_split() function */
-	// Failing
 	char *results1[] = {"Computer", "Systems", "and", "Organization", "2"};
 	test_split(results1, 5, "Computer Systems and Organization 2", " ");
 
@@ -90,12 +89,10 @@ int main() {
 	test_split(results3, 3, "foo:bar!quux", ":!");
 	test_split(results3, 3, "foo:bar!quux", "!:");
 
-	// Failing
 	char *results4[] = {"", "foo", "bar", "quux", ""};
 	test_split(results4, 5, ":foo!:bar::quux!", ":!");
 
 	// Examples 2.2
-	// Failing
 	char *results5[] = {"foo", "bar", "baz"};
 	test_split(results5, 3, "foo\t bar   baz", " \t");
 
@@ -105,11 +102,9 @@ int main() {
 	char *results7[] = {"", "indented"};
 	test_split(results7, 2, "\tindented", " \t");
 
-	// Failing
 	char *results8[] = {"foo", "bar", "baz", ""};
 	test_split(results8, 4, "fooXXXXbarZXYXYXZbazYYYYY", "XYZ");
 
-	// Failing
 	char *results9[] = {"", ""};
 	test_split(results9, 2, "XXXXXXXXXXXXX", "XYZ");
 	
