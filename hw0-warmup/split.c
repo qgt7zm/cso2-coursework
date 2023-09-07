@@ -12,8 +12,10 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 	int endIdx = 0;
 
 	while (endIdx < strlen(input)) {
+		int span = strcspn(input + startIdx, sep);
+
 		// Find end of token
-		endIdx = startIdx + strcspn(input + startIdx, sep);
+		endIdx = startIdx + span;
 		
 		// Get next token
 		int len = endIdx - startIdx;
@@ -21,6 +23,7 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 		strncpy(token, input + startIdx, len);
 		token[len] = '\0'; // Append null terminator
 
+		// Update indices
 		startIdx = endIdx + 1;
 
 		// Append token
