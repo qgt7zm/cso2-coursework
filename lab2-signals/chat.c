@@ -25,20 +25,19 @@ char *outbox_data;
 // Signal Functions
 
 void displayInbox() {
-	// Display new messages and clear inbox
-	printf("Displaying inbox:\n");
+	printf("New message: ");
 	fputs(inbox_data, stdout);
 	fflush(stdout);
-	inbox_data[0] = '\0';
+	inbox_data[0] = '\0'; // Clear inbox
 }
 
-void stopOtherProgram() {
+void logoutOtherUser() {
 	kill(other_pid, SIGINT);
 	printf("Logged out other user.\n");
 }
 
-void cleanup() {
-	munmap(inbox_data, mailbox_size);	// Deallocate pointer
+void logout() {
+	munmap(inbox_data, mailbox_size); // Deallocate pointer
 	shm_unlink(inbox_filename); // Deallocate shared memory under filename
 
 	munmap(outbox_data, mailbox_size);
@@ -50,13 +49,14 @@ void cleanup() {
 
 static void handleSignal(int signum) {
     if (signum == SIGINT) {
-		// Exit both programs on Ctrl-C
-		stopOtherProgram();
-		cleanup();
+		// Exit both users with Ctrl-C
+		logoutOtherUser();
+		logout();
 	} else if (signum == SIGTERM) {
 		// Called by other program
-		cleanup();
+		logout();
 	} else if (signum == SIGUSR1) {
+		// User-defined signal
 		displayInbox();
 	}
 }
@@ -81,11 +81,11 @@ int getOtherUserPid() {
 
 	int size = 64;
 	char input[size];
-	fgets(input, size, stdin); // Use fgets to avoid unflushed stdin
+	fgets(input, size, stdin); // Use fgets() to avoid unflushed stdin
 
-	int otherUser = 0;
-	sscanf(input, "%d\n", &otherUser); // Scan int from input string
-	return otherUser;
+	int other_user = 0;
+	sscanf(input, "%d\n", &other_user); // Scan int from input string
+	return other_user;
 }
 
 void getFilename(char filename[], int pid) {
@@ -93,64 +93,55 @@ void getFilename(char filename[], int pid) {
 }
 
 int getFileDescriptor(char filename[]) {
-	// Get inbox file descriptor
+	// Get file descriptor
 	int fd = shm_open(filename, O_CREAT | O_RDWR, 0666);
  	if (fd < 0) { /* something went wrong */ }
 	ftruncate(fd, mailbox_size); // Allocate shared memory space
 	return fd;
 }
 
+void getFileAsString(char **file_data, int fd) {
+	// Attach pointer to file descriptor
+	*file_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (*file_data == (char*) MAP_FAILED) { /* something went wrong */ }
+	close(fd); // Deallocate file descriptor, keep pointer
+}
+
 // Objective: Create a signal-base two-user chat program
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/signals.html
 int main() {
 	pid_t pid = getpid();
-
-	setupSignalHandler();
-
 	printf("Logged in.\n");
 	printf("Process ID: %d\n", pid);
 
-	/* Inbox */
+	setupSignalHandler();
 
+	/* Set-up Inbox */
 	getFilename(inbox_filename, pid);
-
 	int inbox_fd = getFileDescriptor(inbox_filename);
-	// Convert file descriptor to pointer
-	inbox_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, inbox_fd, 0);
-	if (inbox_data == (char*) MAP_FAILED) { /* something went wrong */ }
-	close(inbox_fd); // Deallocate file descriptor, keep pointer
+	getFileAsString(&inbox_data, inbox_fd);
 
-	/* Outbox */
-
+	/* Set-up Outbox */
 	other_pid = getOtherUserPid();
 	printf("Other User ID: %d\n", other_pid);
 	getFilename(outbox_filename, other_pid);
 
 	int outbox_fd = getFileDescriptor(outbox_filename);
-	outbox_data = mmap(NULL, mailbox_size, PROT_READ | PROT_WRITE, MAP_SHARED, outbox_fd, 0);
-	if (outbox_data == (char*) MAP_FAILED) {}
-	close(outbox_fd);
+	getFileAsString(&outbox_data, outbox_fd);
 
-	int input_size = 512;
-	char input_data[input_size];
-
-	printf("inbox = '%s'\n", inbox_data);
-	printf("outbox = '%s'\n", outbox_data);
-
+	/* Chat With Other User */
 	while (1) {
 		// Send message
-		printf("Type a message to send: ");
+		printf("Send a message: ");
 		char *msg = fgets(outbox_data, mailbox_size, stdin);
 		if (!msg) break; // EOF
-		printf("Sent message = %s", msg);
+
+		kill(other_pid, SIGUSR1); // Notify other user
 
 		// Wait until received
 		while(outbox_data[0]) { usleep(10000); }
 		printf("Message received.\n");
-
-		kill(getpid(), SIGUSR1); // Display inbox
 	}
 
-	// Destroy
-	cleanup();
+	logout();
 }
