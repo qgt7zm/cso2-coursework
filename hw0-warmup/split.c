@@ -27,7 +27,12 @@ char **string_split(const char *input, const char *sep, int *num_words) {
 		
 		// Append next token
 		int len = endIdx - startIdx;
-		result[*num_words] = strndup(input + startIdx, len);
+		// result[*num_words] = strndup(input + startIdx, len); // strdup not defined on some OS
+
+		char *token = calloc(sizeof(char), len + 1);
+		strncpy(token, input + startIdx, len);
+		token[len] = '\0'; // Append null terminator
+		result[*num_words] = token;
 
 		// Resize array
 		*num_words += 1;
