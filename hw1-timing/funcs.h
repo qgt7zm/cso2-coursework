@@ -6,7 +6,9 @@
 #define FUNCS_H
 
 // Do nothing
-void emptyFunc() {
+// Don't omit this in compilation
+__attribute__((noinline)) void emptyFunc() {
+	__asm__("");
 }
 
 // Get the parent process id
@@ -16,17 +18,18 @@ void runSyscall() {
 
 // Run the "true" command
 void runShellCmd() {
-	system("/bin/true || /usr/bin/true");
+	system("/usr/bin/true");
 }
 
 // Signal the current process
 void signalCurrentProcess() {
-	kill(getpid(), SIGUSR1);
+	raise(SIGUSR1);
 }
 
 // Signal another process
 void signalOtherProcess(pid_t pid) {
 	kill(pid, SIGUSR1);
+	// TODO 2.6 make sure signal is received
 }
 
 #endif

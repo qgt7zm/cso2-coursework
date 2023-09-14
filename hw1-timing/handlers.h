@@ -11,7 +11,7 @@
 void handleSignal(int signum) {
 	if (signum == SIGUSR1) {
 		stopTimer();
-		printf("Received a signal!\n");
+		// printf("Received a signal!\n");
 	}
 }
 
