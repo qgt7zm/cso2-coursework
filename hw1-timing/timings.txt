@@ -1,7 +1,15 @@
-<<Test Results>>
-Function Choice = 2
-Number of Trials = 500
-Overhead = 90 ns
-Avg time = 590 ns
-Avg time = 0.000590 ms
-Avg time = 0.000006 sec
+<< Test Results >>
+Program Argument = 5
+
+Overhead time = 102 ns
+
+Total time with overhead = 7990000 ns
+Number of trials = 1000
+
+Avg time w/ overhead = Total time / Num trials
+Avg time with overhead = 7990 ns
+
+Avg time w/o overhead = Avg time w/ overhead - Overhead
+Avg time = 7888 ns
+Avg time = 0.007888 ms
+Avg time = 0.000079 sec

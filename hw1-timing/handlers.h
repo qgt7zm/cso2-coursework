@@ -11,7 +11,7 @@
 void handleSignal(int signum) {
 	if (signum == SIGUSR1) {
 		stopTimer();
-		// printf("Received a signal!\n");
+		// printf("Process %d received a signal!\n", getpid());
 	}
 }
 
@@ -31,6 +31,8 @@ void printOwnPid() {
 }
 
 pid_t askForPid() {
+	printf("Enter process ID: ");
+
 	int size = 64;
 	char input[size];
 	fgets(input, size, stdin);
@@ -38,6 +40,14 @@ pid_t askForPid() {
 	pid_t pid = 0;
 	sscanf(input, "%d\n", &pid);
 	return pid;
+}
+
+void waitForInterrupt() {
+	int size = 64;
+	char input[size];
+	while (fgets(input, size, stdin)) {
+		printf("Waiting for keyboard interrupt...");
+	}
 }
 
 #endif

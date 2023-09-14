@@ -12,14 +12,14 @@
 #include "timer.h"
 
 // Globals
-#define NUM_TRIALS 500
+#define NUM_TRIALS 1000
 
 long long timeStart = 0l;
 long long timeStop = 0l;
 
 long long trialTimes[NUM_TRIALS];
 
-// Header Functions
+// Timer Functions
 void startTimer() {
 	timeStart = getnsecs();
 }
@@ -33,15 +33,20 @@ void recordTrial(int currTrial) {
 	trialTimes[currTrial] = trialTime;
 }
 
-// TODO Don't average, get total
-long double getAvgTime() {
+long long getTotalTime() {
 	long long totalTime = 0l;
 	for (int i = 0; i < NUM_TRIALS; i++) {
 		totalTime += trialTimes[i];
 	}
-	return totalTime / (double) NUM_TRIALS;
+	return totalTime;
 }
 
+long double getAvgTime() {
+	return getTotalTime() / (double) NUM_TRIALS;
+}
+
+// Objective: Estimate the duration of different functions
+// Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/systiming.html
 int main(int argc, char *argv[]) {
 	createSignalHandler();
 
@@ -97,6 +102,7 @@ int main(int argc, char *argv[]) {
 				stopTimer();
 				recordTrial(i);
 			}
+			
 			break;
 		case 4:
 			for (int i = 0; i < NUM_TRIALS; i++) {
@@ -120,8 +126,9 @@ int main(int argc, char *argv[]) {
 		case -1:
 			printOwnPid();
 			otherPid = askForPid();
+			signalOtherProcess(otherPid);
 			
-			askForPid();
+			waitForInterrupt();
 			break;
 		default:
 			return 1;
@@ -133,14 +140,28 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Calculate Final Result
-	long double avgTime = getAvgTime() - overheadTime;
+	long long totalTime = getTotalTime();
+	long double avgTime = totalTime / (double) NUM_TRIALS;
 
-	// Print Final Result
+	// Log Results
 	FILE *file = fopen("timings.txt","w");
-	fprintf(file, "<<Test Results>>\n");
-	fprintf(file, "Function Choice = %d\n", funcChoice);
-	fprintf(file, "Number of Trials = %d\n", NUM_TRIALS);
-	fprintf(file, "Overhead = %.0Lf ns\n", overheadTime);
+	fprintf(file, "<< Test Results >>\n");
+	fprintf(file, "Program Argument = %d\n", funcChoice);
+	fprintf(file, "\n");
+
+	fprintf(file, "Overhead time = %.0Lf ns\n", overheadTime);
+	fprintf(file, "\n");
+
+	fprintf(file, "Total time with overhead = %lld ns\n", totalTime);
+	fprintf(file, "Number of trials = %d\n", NUM_TRIALS);
+	fprintf(file, "\n");
+
+	fprintf(file, "Avg time w/ overhead = Total time / Num trials\n");
+	fprintf(file, "Avg time with overhead = %.0Lf ns\n", avgTime);
+	fprintf(file, "\n");
+	
+	avgTime -= overheadTime;
+	fprintf(file, "Avg time w/o overhead = Avg time w/ overhead - Overhead\n");
 	fprintf(file, "Avg time = %.0Lf ns\n", avgTime);
 	fprintf(file, "Avg time = %Lf ms\n", avgTime / 1000000.0l);
 	fprintf(file, "Avg time = %Lf sec\n", avgTime / 100000000.0l);
