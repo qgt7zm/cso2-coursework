@@ -18,7 +18,7 @@ void runSyscall() {
 
 // Run the "true" command
 void runShellCmd() {
-	system("/usr/bin/true");
+	system("/usr/bin/true || /bin/true");
 }
 
 // Signal the current process

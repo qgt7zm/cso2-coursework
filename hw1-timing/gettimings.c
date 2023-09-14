@@ -33,6 +33,7 @@ void recordTrial(int currTrial) {
 	trialTimes[currTrial] = trialTime;
 }
 
+// TODO Don't average, get total
 long double getAvgTime() {
 	long long totalTime = 0l;
 	for (int i = 0; i < NUM_TRIALS; i++) {
@@ -68,11 +69,11 @@ int main(int argc, char *argv[]) {
 		recordTrial(i);
 	}
 	overheadTime = getAvgTime();
-	printf("Overhead time is %.0Lf ns\n", overheadTime);
 
 	// TODO function pointers?
 	switch (funcChoice) {
 		case 1:
+			// TODO fix negative times
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 				emptyFunc();
@@ -89,6 +90,7 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		case 3:
+			// TODO fix super long times
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 				runShellCmd();
@@ -104,12 +106,14 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		case 5:
+			// TODO fix negative times
 			printOwnPid();
 			otherPid = askForPid();
 
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 				signalOtherProcess(otherPid);
+				stopTimer();
 				recordTrial(i);
 			}
 			break;
@@ -124,9 +128,22 @@ int main(int argc, char *argv[]) {
 			break;
 	}
 
+	if (funcChoice == -1) {
+		return 0;
+	}
+
+	// Calculate Final Result
 	long double avgTime = getAvgTime() - overheadTime;
-	printf("That took %.0Lf ns!\n", avgTime);
-	printf("That took %Lf ms!\n", avgTime / 1000000.0l);
-	printf("That took %Lf sec!\n", avgTime / 1000000000.0l);
+
+	// Print Final Result
+	FILE *file = fopen("timings.txt","w");
+	fprintf(file, "<<Test Results>>\n");
+	fprintf(file, "Function Choice = %d\n", funcChoice);
+	fprintf(file, "Number of Trials = %d\n", NUM_TRIALS);
+	fprintf(file, "Overhead = %.0Lf ns\n", overheadTime);
+	fprintf(file, "Avg time = %.0Lf ns\n", avgTime);
+	fprintf(file, "Avg time = %Lf ms\n", avgTime / 1000000.0l);
+	fprintf(file, "Avg time = %Lf sec\n", avgTime / 100000000.0l);
+
 	return 0;
 }

@@ -1,0 +1,7 @@
+<<Test Results>>
+Function Choice = 2
+Number of Trials = 500
+Overhead = 90 ns
+Avg time = 590 ns
+Avg time = 0.000590 ms
+Avg time = 0.000006 sec
