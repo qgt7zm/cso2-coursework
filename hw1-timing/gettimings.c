@@ -6,20 +6,22 @@
 
 #include <time.h>
 
+// User Headers
 #include "funcs.h"
 #include "handlers.h"
+#include "timer.h"
 
-long long getnsecs() {
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1000000000 + t.tv_nsec;
+// Globals
+long long timeStart;
+long long timeStop;
+
+// Header Functions
+void startTimer() {
+	timeStart = getnsecs();
 }
 
-void getTimeDiff(long long timeStart, long long timeEnd) {
-	long long timeDiff = timeEnd - timeStart;
-	printf("That took %lld ns!\n", timeDiff);
-	printf("That took %f ms!\n", timeDiff / 1000000.0);
-	printf("That took %f sec!\n", timeDiff / 1000000000.0);
+void stopTimer() {
+	timeStop = getnsecs();
 }
 
 int main(int argc, char *argv[]) {
@@ -34,24 +36,29 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	long long timeStart = getnsecs();
-	
 	switch (funcChoice) {
 		case 1:
+			startTimer();
 			emptyFunc();
+			stopTimer();
 			break;
 		case 2:
+			startTimer();
 			runSyscall();
+			stopTimer();
 			break;
 		case 3:
+			startTimer();
 			runShellCmd();
 			break;
 		case 4:
+			startTimer();
 			signalCurrentProcess();
 			break;
 		case 5:
 			printOwnPid();
 			otherPid = askForPid();
+			startTimer();
 			signalOtherProcess(otherPid);
 			break;
 		case -1:
@@ -65,6 +72,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	long long timeEnd = getnsecs();
-	getTimeDiff(timeStart, timeEnd);
+
+	long long timeDiff = timeEnd - timeStart;
+	printf("That took %lld ns!\n", timeDiff);
+	printf("That took %Lf ms!\n", timeDiff / 1000000.0l);
+	printf("That took %Lf sec!\n", timeDiff / 1000000000.0l);
 	return 0;
 }

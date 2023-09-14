@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "timer.h"
+
 #ifndef HANDLERS_H
 #define HANDLERS_H
 
 void handleSignal(int signum) {
 	if (signum == SIGUSR1) {
+		stopTimer();
 		printf("Received a signal!\n");
-		// stop timer
 	}
 }
 
@@ -35,8 +37,6 @@ pid_t askForPid() {
 
 	pid_t pid = 0;
 	sscanf(input, "%d\n", &pid);
-
-	// printf("Pid = %d\n", pid);
 	return pid;
 }
 
