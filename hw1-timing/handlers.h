@@ -1,7 +1,7 @@
-#include <signal.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
+
+#include <signal.h>
 
 #include "timer.h"
 
@@ -10,8 +10,8 @@
 
 void handleSignal(int signum) {
 	if (signum == SIGUSR1) {
-		stopTimer();
-		// printf("Process %d received a signal!\n", getpid());
+		printf("Process %d received a signal!\n", getpid());
+		stopTimer(); // Stop the timer after the handler starts
 	}
 }
 
@@ -31,7 +31,7 @@ void printOwnPid() {
 }
 
 pid_t askForPid() {
-	printf("Enter process ID: ");
+	printf("Enter other process ID: ");
 
 	int size = 64;
 	char input[size];
@@ -45,9 +45,9 @@ pid_t askForPid() {
 void waitForInterrupt() {
 	int size = 64;
 	char input[size];
-	while (fgets(input, size, stdin)) {
-		printf("Waiting for keyboard interrupt...");
-	}
+	do {
+		printf("Waiting for keyboard interrupt... ");
+	} while (fgets(input, size, stdin));
 }
 
 #endif

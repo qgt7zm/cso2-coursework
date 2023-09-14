@@ -2,48 +2,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-#include <time.h>
 
 // User Headers
 #include "funcs.h"
 #include "handlers.h"
 #include "timer.h"
-
-// Globals
-#define NUM_TRIALS 1000
-
-long long timeStart = 0l;
-long long timeStop = 0l;
-
-long long trialTimes[NUM_TRIALS];
-
-// Timer Functions
-void startTimer() {
-	timeStart = getnsecs();
-}
-
-void stopTimer() {
-	timeStop = getnsecs();
-}
-
-void recordTrial(int currTrial) {
-	long long trialTime = timeStop - timeStart;
-	trialTimes[currTrial] = trialTime;
-}
-
-long long getTotalTime() {
-	long long totalTime = 0l;
-	for (int i = 0; i < NUM_TRIALS; i++) {
-		totalTime += trialTimes[i];
-	}
-	return totalTime;
-}
-
-long double getAvgTime() {
-	return getTotalTime() / (double) NUM_TRIALS;
-}
 
 // Objective: Estimate the duration of different functions
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/systiming.html
@@ -57,6 +20,7 @@ int main(int argc, char *argv[]) {
 	if (argc > 1) {
 		funcChoice = atoi(argv[1]);
 	} else {
+		printf("Usage: gettimings <func>\n");
 		return 1;
 	}
 
@@ -75,6 +39,7 @@ int main(int argc, char *argv[]) {
 	}
 	overheadTime = getAvgTime();
 
+	// Time the Function
 	// TODO function pointers?
 	switch (funcChoice) {
 		case 1:
@@ -102,7 +67,6 @@ int main(int argc, char *argv[]) {
 				stopTimer();
 				recordTrial(i);
 			}
-			
 			break;
 		case 4:
 			for (int i = 0; i < NUM_TRIALS; i++) {
@@ -131,11 +95,13 @@ int main(int argc, char *argv[]) {
 			waitForInterrupt();
 			break;
 		default:
+			printf("Argument 'num' must be an integer 1-5 or -1.\n");
 			return 1;
 			break;
 	}
 
 	if (funcChoice == -1) {
+		printf("Program completed.\n");
 		return 0;
 	}
 
@@ -166,5 +132,6 @@ int main(int argc, char *argv[]) {
 	fprintf(file, "Avg time = %Lf ms\n", avgTime / 1000000.0l);
 	fprintf(file, "Avg time = %Lf sec\n", avgTime / 100000000.0l);
 
+	printf("Program completed.\n");
 	return 0;
 }
