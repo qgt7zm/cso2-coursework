@@ -11,4 +11,4 @@ gettimings.o: funcs.h handlers.h timer.h
 .PHONY: clean all
 
 clean:
-	rm -r $(exec) *.o
+	rm -r $(exec) *.o timings.txt

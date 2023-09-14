@@ -1,2 +1,5 @@
 # Executable files
 gettimings
+
+# Output files
+timings.txt
