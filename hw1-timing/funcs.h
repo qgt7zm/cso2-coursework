@@ -29,7 +29,7 @@ void signalCurrentProcess() {
 // Signal another process
 void signalOtherProcess(pid_t pid) {
 	kill(pid, SIGUSR1);
-	// TODO 2.6 make sure signal is received
+	// TODO 2.6 wait until signal is received
 }
 
 #endif

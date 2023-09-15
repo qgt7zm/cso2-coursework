@@ -43,8 +43,6 @@ void displayResults() {
 // Objective: Estimate the duration of different functions
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/systiming.html
 int main(int argc, char *argv[]) {
-	createSignalHandler();
-
 	// Parse CL Args
 	pid_t otherPid;
 
@@ -99,30 +97,54 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		case 4:
+			setSignalHandler();
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 				signalCurrentProcess();
+				// Don't need wait for signal since sending to same process
 				recordTrial(i);
 			}
+			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
 			break;
 		case 5:
-			// TODO fix negative times
+			setSignalHandler();
+			setSignalBlocker();
 			printOwnPid();
 			otherPid = askForPid();
 
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
+
+				blockSignals();
 				signalOtherProcess(otherPid);
+				printf("Signaled other process\n");
+				waitForSignalRecieved();
+				unblockSignals();
+
 				stopTimer();
+				// TODO send back signal
+				signalsReceived += 1;
 				recordTrial(i);
 			}
+			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
 			break;
 		case -1:
+			setSignalHandler();
+			setSignalBlocker();
 			printOwnPid();
 			otherPid = askForPid();
-			signalOtherProcess(otherPid);
+
+			// while (1) {
+			// 	blockSignals();
+			// 	signalOtherProcess(otherPid);
+			// 	waitForSignalRecieved();
+			// 	unblockSignals();
+
+			// 	signalsReceived += 1;
+			// }
 			
 			waitForInterrupt();
+			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
 			break;
 		default:
 			printf("Argument 'num' must be an integer 1-5 or -1.\n");

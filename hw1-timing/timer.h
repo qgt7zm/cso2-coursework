@@ -8,9 +8,9 @@
 // Globals
 #define NUM_TRIALS 1000
 
-long long timeStart = 0l;
-long long timeStop = 0l;
-long long trialTimes[NUM_TRIALS];
+static long long timeStart = 0l;
+static long long timeStop = 0l;
+static long long trialTimes[NUM_TRIALS];
 
 // Timer Functions
 long long getnsecs() {
