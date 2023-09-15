@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "globals.h"
+
 #ifndef FUNCS_H
 #define FUNCS_H
 
@@ -27,9 +29,9 @@ void signalCurrentProcess() {
 }
 
 // Signal another process
-void signalOtherProcess(pid_t pid) {
-	kill(pid, SIGUSR1);
-	// TODO 2.6 wait until signal is received
+void signalOtherProcess() {
+	waitForSignal = 1;
+	kill(otherPid, SIGUSR1);
 }
 
 #endif

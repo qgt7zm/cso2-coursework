@@ -1,11 +1,10 @@
-#define _XOPEN_SOURCE 700
-
+#define _XOPEN_SOURCE 600
 #include <time.h>
 
 #ifndef TIMER_H
 #define TIMER_H
 
-// Globals
+// Global Variables
 #define NUM_TRIALS 1000
 
 static long long timeStart = 0l;

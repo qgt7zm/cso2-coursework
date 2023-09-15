@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// User Headers
+#include "globals.h"
 #include "funcs.h"
 #include "handlers.h"
 #include "timer.h"
@@ -44,8 +44,6 @@ void displayResults() {
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/systiming.html
 int main(int argc, char *argv[]) {
 	// Parse CL Args
-	pid_t otherPid;
-
 	if (argc > 1) {
 		funcChoice = atoi(argv[1]);
 	} else {
@@ -97,7 +95,7 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		case 4:
-			setSignalHandler();
+			setSignalHandlerForSelf();
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 				signalCurrentProcess();
@@ -107,41 +105,33 @@ int main(int argc, char *argv[]) {
 			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
 			break;
 		case 5:
-			setSignalHandler();
-			setSignalBlocker();
+			setSignalHandlerForOther();
 			printOwnPid();
-			otherPid = askForPid();
+			askForPid();
 
 			for (int i = 0; i < NUM_TRIALS; i++) {
 				startTimer();
 
-				blockSignals();
-				signalOtherProcess(otherPid);
-				printf("Signaled other process\n");
-				waitForSignalRecieved();
-				unblockSignals();
+				waitForSignal = 1;
+				signalOtherProcess();
+				// printf("Sent signal to other process\n");
+
+				// Wait for signal
+				while (waitForSignal) {
+					usleep(10);
+				}
+				// printf("Signal received by other process\n");
 
 				stopTimer();
 				// TODO send back signal
-				signalsReceived += 1;
 				recordTrial(i);
 			}
 			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
 			break;
 		case -1:
-			setSignalHandler();
-			setSignalBlocker();
+			setSignalHandlerForOther();
 			printOwnPid();
-			otherPid = askForPid();
-
-			// while (1) {
-			// 	blockSignals();
-			// 	signalOtherProcess(otherPid);
-			// 	waitForSignalRecieved();
-			// 	unblockSignals();
-
-			// 	signalsReceived += 1;
-			// }
+			askForPid();
 			
 			waitForInterrupt();
 			printf("Received %d/%d signals.\n", signalsReceived, NUM_TRIALS);
