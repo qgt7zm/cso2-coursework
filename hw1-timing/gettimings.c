@@ -1,5 +1,3 @@
-#define _XOPEN_SOURCE 700
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,13 +6,46 @@
 #include "handlers.h"
 #include "timer.h"
 
+// Globals
+int funcChoice;
+long double overheadTime;
+
+// Helper Functions
+void displayResults() {
+	// Calculate Final Result
+	long long totalTime = getTotalTime();
+	long double avgTime = totalTime / (double) NUM_TRIALS;
+
+	// Log Results
+	FILE *file = fopen("timings.txt","w");
+	fprintf(file, "<< Test Results >>\n");
+	fprintf(file, "Program Argument = %d\n", funcChoice);
+	fprintf(file, "Number of trials = %d\n", NUM_TRIALS);
+	fprintf(file, "\n");
+
+	fprintf(file, "Average overhead time = %.0Lf ns\n", overheadTime);
+	fprintf(file, "\n");
+
+	fprintf(file, "Total time with overhead = %lld ns\n", totalTime);
+	fprintf(file, "\n");
+
+	fprintf(file, "Avg time w/ overhead = Total time / Num trials\n");
+	fprintf(file, "Avg time with overhead = %.0Lf ns\n", avgTime);
+	fprintf(file, "\n");
+	
+	avgTime -= overheadTime;
+	fprintf(file, "Avg time w/o overhead = Avg time w/ overhead - Overhead\n");
+	fprintf(file, "Avg time = %.0Lf ns\n", avgTime);
+	fprintf(file, "Avg time = %Lf ms\n", avgTime / 1000000.0l);
+	fprintf(file, "Avg time = %Lf sec\n", avgTime / 100000000.0l);
+}
+
 // Objective: Estimate the duration of different functions
 // Source: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/systiming.html
 int main(int argc, char *argv[]) {
 	createSignalHandler();
 
 	// Parse CL Args
-	int funcChoice;
 	pid_t otherPid;
 
 	if (argc > 1) {
@@ -31,7 +62,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Record Overhead Time
-	long double overheadTime = 0l;
 	for (int i = 0; i < NUM_TRIALS; i++) {
 		startTimer();
 		stopTimer();
@@ -100,38 +130,9 @@ int main(int argc, char *argv[]) {
 			break;
 	}
 
-	if (funcChoice == -1) {
-		printf("Program completed.\n");
-		return 0;
+	if (funcChoice != -1) {
+		displayResults();
 	}
-
-	// Calculate Final Result
-	long long totalTime = getTotalTime();
-	long double avgTime = totalTime / (double) NUM_TRIALS;
-
-	// Log Results
-	FILE *file = fopen("timings.txt","w");
-	fprintf(file, "<< Test Results >>\n");
-	fprintf(file, "Program Argument = %d\n", funcChoice);
-	fprintf(file, "\n");
-
-	fprintf(file, "Overhead time = %.0Lf ns\n", overheadTime);
-	fprintf(file, "\n");
-
-	fprintf(file, "Total time with overhead = %lld ns\n", totalTime);
-	fprintf(file, "Number of trials = %d\n", NUM_TRIALS);
-	fprintf(file, "\n");
-
-	fprintf(file, "Avg time w/ overhead = Total time / Num trials\n");
-	fprintf(file, "Avg time with overhead = %.0Lf ns\n", avgTime);
-	fprintf(file, "\n");
-	
-	avgTime -= overheadTime;
-	fprintf(file, "Avg time w/o overhead = Avg time w/ overhead - Overhead\n");
-	fprintf(file, "Avg time = %.0Lf ns\n", avgTime);
-	fprintf(file, "Avg time = %Lf ms\n", avgTime / 1000000.0l);
-	fprintf(file, "Avg time = %Lf sec\n", avgTime / 100000000.0l);
-
 	printf("Program completed.\n");
 	return 0;
 }
