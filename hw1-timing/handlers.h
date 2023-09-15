@@ -25,10 +25,10 @@ static void handleSignalFromOther(int signum) {
 		signalsReceived += 1;
 		// printf("Process %d received a signal!\n", getpid());
 	} else if (signum == SIGUSR2) {
-		// Stop timer
+		// Signal received from second program
 		waitForSignal = 0;
 		signalsReceived += 1;
-		stopTimer(); // Stop the timer after the handler starts
+		stopTimer();
 	}
 }
 
@@ -74,7 +74,7 @@ void waitForInterrupt() {
 	int size = 64;
 	char input[size];
 	do {
-		printf("Waiting for keyboard interrupt... ");
+		printf("Waiting for keyboard interrupt... \n");
 	} while (fgets(input, size, stdin));
 }
 
