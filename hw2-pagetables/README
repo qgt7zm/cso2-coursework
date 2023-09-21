@@ -1,0 +1,13 @@
+Multi-Level Page Table
+
+This program implements a multi-level page table for translating
+virtual addresses into physical addresses.
+
+The header file "config.h" stores program parameters. The constant
+"LEVELS" controls how many levels the page table has. A value of 1
+means the page table is stored as an array. A higher value means
+the page table is stored as a tree.
+
+The constant "POBITS" affects how many bits are in the page offset
+for a virtual address. Each page table will also have the same number
+of bytes.

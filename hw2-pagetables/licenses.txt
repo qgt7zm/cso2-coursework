@@ -1,0 +1,13 @@
+Licenses
+
+Permissive Licenses
+- Apache License: https://apache.org/licenses/LICENSE-2.0
+- MIT License: https://mit-license.org/ (selected)
+- WTFPL License: https://en.wikipedia.org/wiki/WTFPL
+
+Copyleft Licenses
+- GNU GPL License: https://www.gnu.org/licenses/gpl-3.0.en.html
+- Mozilla Public License: https://www.mozilla.org/en-US/MPL/
+
+Copyright Licenses
+- Creative Commons License: https://creativecommons.org/licenses/
