@@ -23,14 +23,10 @@ size_t get_page_offset(size_t address) {
     return (address << pn_bits) >> pn_bits;
 }
 
-size_t get_page_address(size_t page_num) {
-    return page_num << POBITS;
-}
-
 int is_valid(size_t entry) {
     return entry & 1;
 }
 
-size_t get_data(size_t entry) {
-    return entry >> 1;
+size_t get_page_address(size_t page_num) {
+    return page_num << POBITS;
 }

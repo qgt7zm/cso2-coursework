@@ -12,19 +12,27 @@ extern int table_size;
 /** Sets ptbr to 0. */
 void initialize();
 
-/** The physical page number of an address, equal to the first 64 - POBITS bits. */
+/** 
+ * Get the virtual page number of an address or entry, equal to the first
+ * 64 - POBITS bits.
+ */
 size_t get_page_number(size_t address);
 
-/** The page offset of an address, equal to the last POBITS bits. */
+/**
+ * Get the page offset of a virtual or physical address, equal to the last
+ * POBITS bits.
+ */
 size_t get_page_offset(size_t address);
 
-/** The base address of a physical page number, equal to address * 2^POBITS. */
-size_t get_page_address(size_t page_num);
-
-/** Whether an entry points to valid data, according to the last bit. */
+/** 
+ * Whether an page table entry points to valid page or table, according to
+ * the last bit in an entry.
+ */
 int is_valid(size_t entry);
 
-/** Get the data stored under an entry, either a page table entry or physical address */
-size_t get_data(size_t entry);
+/** 
+ * Get the base address of a physical page number, equal to page_num * 2^POBITS.
+ */
+size_t get_page_address(size_t page_num);
 
 #endif
