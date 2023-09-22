@@ -15,10 +15,22 @@ void initialize() {
     printf("Page table size is %d entries.\n", table_size);
 }
 
-int is_valid(size_t entry) {
-    return entry & 1; // Check last bit
+size_t get_page_number(size_t address) {
+    return address >> POBITS;
 }
 
-size_t get_page_number(size_t entry) {
-    return entry >> POBITS;
+size_t get_page_offset(size_t address) {
+    return (address << pn_bits) >> pn_bits;
+}
+
+size_t get_page_address(size_t page_num) {
+    return page_num << POBITS;
+}
+
+int is_valid(size_t entry) {
+    return entry & 1;
+}
+
+size_t get_data(size_t entry) {
+    return entry >> 1;
 }

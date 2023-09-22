@@ -16,7 +16,7 @@ util.o: util.h
 .PHONY: clean all check
 
 check:
-	$(CC) -Wall main.c -o $(exec)
+	$(CC) -Wall main.c util.c -o $(exec)
 
 clean:
 	rm -r $(exec) *.o
