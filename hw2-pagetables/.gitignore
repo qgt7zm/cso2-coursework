@@ -1,2 +1,5 @@
 # Executable files
 pagetable
+
+# Static libraries
+*.a
