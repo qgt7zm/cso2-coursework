@@ -4,13 +4,19 @@
 #define UTIL_H
 
 /** The number of bits for the page number in an entry, equal to 64 - POBITS. */
-extern int pn_bits;
+extern const int pn_bits;
+
+/** The number of bits in a page table, equal to 2^POBITS bits. */
+extern const int table_bits;
 
 /** The number of entries in a page table, equal to (2^POBITS) / 8 bytes. */
-extern int table_size;
+extern const int table_size;
 
 /** Sets ptbr to 0. */
 void initialize();
+
+/** Sets ptbr as a pointer to the root array. */
+void set_ptbr(size_t root_table[]);
 
 /** 
  * Get the virtual page number of an address or entry, equal to the first

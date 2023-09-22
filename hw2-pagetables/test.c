@@ -22,6 +22,8 @@ void test_translate_single(size_t page_table[], size_t address) {
         printf("- Entry is valid\n");
     } else {
         printf("- Entry is invalid\n");
+        static size_t invalid_address = ~0;
+        printf("- Physical address = 0x%lx\n", invalid_address);
         printf("\n");
         return;
     }
@@ -30,10 +32,11 @@ void test_translate_single(size_t page_table[], size_t address) {
     printf("- Physical page number = 0x%lx\n", ppn);
 
     size_t page_add = get_page_address(ppn);
-    printf("- Page address = ptbr + 0x%lx\n", page_add);
+    printf("- Page address = 0x%lx\n", page_add);
 
     size_t p_add = page_add + page_off;
-    printf("- Physical address = ptbr + 0x%lx\n", p_add);
+    printf("- Physical address = 0x%lx\n", p_add);
+    printf("- Physical address + ptbr = 0x%lx\n", p_add + ptbr);
 
     printf("\n");
 }
@@ -50,7 +53,10 @@ void test(size_t page_table[]) {
 int main(int argc, char *argv[]) {
     initialize();
 
+    __attribute__((aligned(4096)))
     size_t page_table[table_size]; // stores PTEs
+    set_ptbr(page_table);
+
     test(page_table);
 
     printf("Program completed.\n");

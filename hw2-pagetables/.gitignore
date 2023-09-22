@@ -1,5 +1,5 @@
 # Executable files
-pagetable
+test
 
 # Static libraries
 *.a

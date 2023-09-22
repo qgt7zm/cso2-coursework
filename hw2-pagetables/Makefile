@@ -3,23 +3,25 @@ CFLAGS = ""
 LDFLAGS = ""
 
 libname = libmlpt.a
-exec := pagetable
+exec := test
 headers := config.h mlpt.h
 
 $(libname): mlpt.o util.o
-	ar rcs $@ $^
+	ar rcs $@ $^	
 
-$(exec): main.o $(libname)
+# Run the test code
+$(exec): test.o $(libname)
 	$(CC) $(LDFLAGS) -o $@ $^
+	./$(exec)
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-main.o: config.h $(headers)
+test.o: config.h $(headers)
 mlpt.o: config.h $(headers)
 util.o: util.h
 
-.PHONY: check clean test
+.PHONY: check clean
 
 # Check for compilation warnings
 check: 
@@ -27,7 +29,3 @@ check:
 
 clean:
 	rm -r $(exec) *.o
-
-# Run the test code
-test: $(exec)
-	./$(exec)
