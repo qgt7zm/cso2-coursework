@@ -1,17 +1,21 @@
+CC = clang
+CFLAGS = ""
+LDFLAGS = ""
+
 exec := pagetable
 
 $(exec): main.o
-	cc -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 .c.o:
-	cc -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 main.o: config.h mlpt.h
 
 .PHONY: clean all check
 
 check:
-	gcc -Wall main.c -o $(exec)
+	$(CC) -Wall main.c -o $(exec)
 
 clean:
 	rm -r $(exec) *.o timings.txt

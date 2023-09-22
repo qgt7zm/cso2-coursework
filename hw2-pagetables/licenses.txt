@@ -1,13 +1,31 @@
-Licenses
+Licenses Considered
 
-Permissive Licenses
-- Apache License: https://apache.org/licenses/LICENSE-2.0
-- MIT License: https://mit-license.org/ (selected)
-- WTFPL License: https://en.wikipedia.org/wiki/WTFPL
+1. MIT License: https://mit-license.org/
+	The MIT License is a permissive open-source license, granting all users
+the right to use, share, modify, and sell any software under the license,
+provided the text of the license is provided. The MIT License also permits
+derivative works to be released under a different license or made
+proprietary (closed-source).
 
-Copyleft Licenses
-- GNU GPL License: https://www.gnu.org/licenses/gpl-3.0.en.html
-- Mozilla Public License: https://www.mozilla.org/en-US/MPL/
+2. Apache License: https://apache.org/licenses/LICENSE-2.0
+	The Apache License v2.0 is a permissive license similar to the MIT license,
+providing the same end-user rights and requirements. Additionally, the
+Apache License specifies instructions for patenting a modified software under
+the Apache License. Additionally, all derived software must list changes made to
+the original work.
 
-Copyright Licenses
-- Creative Commons License: https://creativecommons.org/licenses/
+3. GNU General Public License: https://www.gnu.org/licenses/gpl-3.0.en.html
+	The GPL v3 License is among the most restrictive free software licenses.
+As a copyleft license, it grants permissions to use, share, modify,
+and sell licenses. However, unlike permissive licenses, it restricts releasing
+derivative software under any other license or none at all.
+
+Verdict
+	The GPL license is a good choice for protecting intellectual property in free
+software from being stolen by corporations. However, it may incompatible when
+combined with software under other licenses due to its restrictions.
+While Apache and MIT licenses have similar rules, the Apache License also
+includes has language regarding to patenting software. Since this program is
+an educational demonstration of page tables, a widely-known practice, and
+attempts to make no groundbreaking improvements, the MIT License's simple
+nature seems the best choice.
