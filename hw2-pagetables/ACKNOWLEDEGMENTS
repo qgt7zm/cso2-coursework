@@ -1,0 +1,16 @@
+# Acknowledgements
+
+The following course resources were consulted to make this program:
+- Assignment Page: https://www.cs.virginia.edu/~cr4bd/3130/F2023/labhw/pagetable.html
+- Lecture Slides: https://www.cs.virginia.edu/~cr4bd/3130/F2023/schedule.html
+- Readings: https://www.cs.virginia.edu/~cr4bd/3130/F2023/readings/vm.html
+- Piazza: https://piazza.com/class/llhbgfw3gq05hd/
+
+The following internet resources were also consulted:
+- Apache License, Version 2.0: https://apache.org/licenses/LICENSE-2.0
+- GNU GPLv3: https://www.gnu.org/licenses/gpl-3.0.en.html
+- MIT License: https://mit-license.org/
+- StackOverflow, "What does posix_memalign/memalign do": https://stackoverflow.com/questions/6563120/what-does-posix-memalign-memalign-do
+- Wikipedia, "Free-software license": https://en.wikipedia.org/wiki/Free-software_license
+- Wikipedia, "Permissive software": https://en.wikipedia.org/wiki/Permissive_software_license
+- Wikipedia, "Copyleft": https://en.wikipedia.org/wiki/Copyleft

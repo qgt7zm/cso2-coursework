@@ -15,7 +15,7 @@ the Apache License. Additionally, all derived software must list changes made to
 the original work.
 
 3. GNU General Public License: https://www.gnu.org/licenses/gpl-3.0.en.html
-	The GPL v3 License is among the most restrictive free software licenses.
+	The GPLv3 License is among the most restrictive free software licenses.
 As a copyleft license, it grants permissions to use, share, modify,
 and sell licenses. However, unlike permissive licenses, it restricts releasing
 derivative software under any other license or none at all.
