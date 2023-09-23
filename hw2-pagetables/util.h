@@ -7,11 +7,12 @@
 extern const int pn_bits;
 
 /** The number of bits in a page table, equal to 2^POBITS bits. */
-extern const int table_bits;
+extern const int table_size_bits;
 
 /** The number of entries in a page table, equal to (2^POBITS) / 8 bytes. */
-extern const int table_size;
+extern const int table_size_bytes;
 
+/** The pointer to the root table (ptbr). */
 extern size_t* root_table;
 
 /** Sets ptbr to 0. */

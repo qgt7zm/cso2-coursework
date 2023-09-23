@@ -8,21 +8,25 @@
 #include <stdlib.h>
 
 size_t ptbr;
+size_t* root_table = 0;
 const int pn_bits = 64 - POBITS;
-const int table_bits = 2 << (POBITS - 1); // 1 * 2^POBITS
-const int table_size = 2 << (POBITS - 4); // 1 * 2^POBITS / 2^3
+const int table_size_bytes = 2 << (POBITS - 1); // 1 * 2^POBITS
+const int table_size_entries = 2 << (POBITS - 4); // 1 * 2^POBITS / 8
 
 // Memory Functions
 
 void initialize() {
     ptbr = 0;
     printf("Set ptbr to 0.\n");
-    printf("Page table size is %d entries.\n", table_size);
+    printf("Page table size is %d (0x%x) bytes.\n", table_size_bytes, table_size_bytes);
 }
 
 void create_table() {
-    posix_memalign((void *)(&ptbr), table_bits, table_size);
+    // posix_memalign((void *)(&ptbr), table_size_bytes, table_size_bytes);
+    posix_memalign((void *)(&root_table), table_size_bytes, table_size_bytes);
+    ptbr = (size_t) &root_table[0];
     printf("Set ptbr to %lx\n", ptbr);
+    // printf("Set ptbr address to %lx\n", &ptbr);
 }
 
 // Translation Functions
