@@ -19,15 +19,15 @@ test.o: config.h $(headers)
 mlpt.o: config.h $(headers)
 util.o: util.h
 
-.PHONY: check clean run
+.PHONY: all check clean
+
+# Run the test code
+all: $(exec)
+	./$(exec)
 
 # Check for compilation warnings
 check: 
 	make $(libname) CFLAGS="-Wall"
 
 clean:
-	rm -r $(exec) *.o
-
-# Run the test code
-run: $(exec)
-	./$(exec)
+	rm -r $(exec) $(libname) *.o
