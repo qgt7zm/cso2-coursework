@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 size_t translate(size_t va){
-    return 0;
+    return -1;
 }
 
 void page_allocate(size_t va) {

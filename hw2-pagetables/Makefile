@@ -9,10 +9,8 @@ headers := config.h mlpt.h
 $(libname): mlpt.o util.o
 	ar rcs $@ $^	
 
-# Run the test code
 $(exec): test.o $(libname)
 	$(CC) $(LDFLAGS) -o $@ $^
-	./$(exec)
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -21,7 +19,7 @@ test.o: config.h $(headers)
 mlpt.o: config.h $(headers)
 util.o: util.h
 
-.PHONY: check clean
+.PHONY: check clean run
 
 # Check for compilation warnings
 check: 
@@ -29,3 +27,7 @@ check:
 
 clean:
 	rm -r $(exec) *.o
+
+# Run the test code
+run: $(exec)
+	./$(exec)

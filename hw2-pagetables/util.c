@@ -11,7 +11,6 @@ size_t ptbr;
 const int pn_bits = 64 - POBITS;
 const int table_bits = 2 << (POBITS - 1); // 1 * 2^POBITS
 const int table_size = 2 << (POBITS - 4); // 1 * 2^POBITS / 2^3
-// size_t *root_table;
 
 // Memory Functions
 
@@ -21,8 +20,8 @@ void initialize() {
     printf("Page table size is %d entries.\n", table_size);
 }
 
-void set_ptbr(size_t root_table[]) {
-    ptbr = (size_t) &root_table[0];
+void create_table() {
+    posix_memalign((void *)(&ptbr), table_bits, table_size);
     printf("Set ptbr to %lx\n", ptbr);
 }
 

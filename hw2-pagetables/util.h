@@ -18,6 +18,9 @@ void initialize();
 /** Sets ptbr as a pointer to the root array. */
 void set_ptbr(size_t root_table[]);
 
+/** Create the root page table and set ptbr. */
+void create_table();
+
 /** 
  * Get the virtual page number of an address or entry, equal to the first
  * 64 - POBITS bits.
