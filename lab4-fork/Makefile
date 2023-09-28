@@ -2,19 +2,19 @@ CC = clang
 CFLAGS = ""
 LDFLAGS = ""
 
-exec := mysys
+exec := test
 
 all: $(exec)
 	./$(exec)
 
-$(exec): main.o mysystem.o
+$(exec): main.o my_system.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-mysystem.c: mysystem.h
-main.c: mysystem.h
+my_system.o: my_system.h
+main.o: my_system.h
 
 .PHONY: clean all
 
