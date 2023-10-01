@@ -13,6 +13,7 @@ const int table_size_entries = 2 << (POBITS - 4); // 1 * 2^POBITS / 8
 
 // Globals
 size_t ptbr;
+size_t *root_table = 0;
 
 // Allocation Functions
 
@@ -24,24 +25,25 @@ void initialize() {
     printf("\n");
 }
 
-size_t *create_root_table() {
+void create_root_table() {
+    if (ptbr != 0) {
+        root_table = (size_t *) ptbr;
+    }
+
     printf("Creating root page table:\n");
 
-    size_t* root_table = 0;    
     posix_memalign((void *)(&root_table), table_size_bytes, table_size_bytes);
     ptbr = (size_t) &root_table[0];
+    root_table = (size_t *) ptbr;
     
     printf("- Set ptbr = 0x%lx\n", ptbr);
-    printf("\n");
-
-    root_table = (size_t *) ptbr;
-    return root_table;
+    printf("\n");    
 }
 
 size_t create_page(size_t vpn) {
-    size_t *table = 0;    
-    posix_memalign((void *)(&table), table_size_bytes, table_size_bytes);
-    size_t page_address = (size_t) &table[0];
+    size_t *page = 0;    
+    posix_memalign((void *)(&page), table_size_bytes, table_size_bytes);
+    size_t page_address = (size_t) &page[0];
 
     size_t ppn = get_page_number(page_address);
     return ppn;

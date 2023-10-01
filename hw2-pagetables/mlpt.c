@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,9 +11,6 @@
 // Constants
 const size_t invalid_address = ~0;
 
-// Globals
-size_t *root_table = 0;
-
 size_t translate(size_t va) {
     printf("Translating virtual address 0x%lx:\n", va);
 
@@ -21,6 +19,8 @@ size_t translate(size_t va) {
         printf("- Physical address = 0x%lx\n", invalid_address);
         printf("\n");
         return invalid_address;
+    } else {
+        root_table = (size_t *) ptbr;
     }
 
     size_t vpn = get_page_number(va);
@@ -57,7 +57,7 @@ size_t translate(size_t va) {
 void page_allocate(size_t va) {
     // Check if base table is allocated
     if (ptbr == 0) {
-        root_table = create_root_table();
+        create_root_table();
     }
 
     printf("Allocating address 0x%lx:\n", va);

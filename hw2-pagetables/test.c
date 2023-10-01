@@ -7,11 +7,21 @@
 #include "allocate.h"
 #include "translate.h"
 
+void allocate_manual(size_t vpn, size_t ppn) {
+    size_t pte = ppn << POBITS | 1;
+    root_table[vpn] = pte;
+}
+
 void test() {
+    // Manually allocate
+    create_root_table();
+    allocate_manual(0x0, 0x0);
+    allocate_manual(0x123, 0xabc);
+
     // Pre-allocate
-    page_allocate(0x000000);
-    page_allocate(0x000008);
-    page_allocate(0x123456);
+    // page_allocate(0x000000);
+    // page_allocate(0x000008);
+    // page_allocate(0x123456);
 
     // Translate allocated
     translate(0x000000); // Page 0x0, 0x[ppn]000
