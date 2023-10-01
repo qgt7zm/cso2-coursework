@@ -1,12 +1,10 @@
-#include <stddef.h>
-#define _XOPEN_SOURCE 700
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "config.h"
 
 #include "allocate.h"
 #include "translate.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 // Constants
 const int pn_bits = 64 - POBITS;

@@ -5,23 +5,24 @@
 
 // Constants
 
-/** The number of bits in a page table, equal to 2^POBITS bits. */
-extern const int table_size_bits;
-
-/** The number of entries in a page table, equal to (2^POBITS) / 8 bytes. */
+/** The number of bytes in a page table, equal to (2^POBITS) bytes. */
 extern const int table_size_bytes;
 
-// Globals
-
-/** The pointer to the root table (ptbr). */
-extern size_t* root_table;
+/** The number of entries in a page table, equal to 2^POBITS / 8. */
+extern const int table_size_entries;
 
 // Allocation Functions
 
-/** Sets ptbr to 0. */
+/** Prints out debug information and sets ptbr to 0. */
 void initialize();
 
-/** Create the root page table and set ptbr. */
-void create_root_table();
+/** Creates the root page table, sets ptbr, and returns ptbr. */
+size_t *create_root_table();
+
+/**
+ * Allocates a page under the given virtual page number and returns the
+ * physical page number.
+ */
+size_t create_page(size_t vpn);
 
 #endif

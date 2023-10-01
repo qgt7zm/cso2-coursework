@@ -1,13 +1,13 @@
 CC = clang
-CFLAGS = ""
+CFLAGS = -Wall -g -Og
 LDFLAGS = ""
 
 libname = libmlpt.a
 exec := test
-headers := config.h mlpt.h allocate.o translate.h
+headers := config.h mlpt.h allocate.h translate.h
 
 $(libname): mlpt.o translate.o allocate.o
-	ar rcs $@ $^	
+	ar rcs $@ $^
 
 $(exec): test.o $(libname)
 	$(CC) $(LDFLAGS) -o $@ $^
@@ -20,15 +20,11 @@ mlpt.o: $(headers)
 allocate.o: $(headers)
 translate.o: $(headers)
 
-.PHONY: all check clean
+.PHONY: all clean
 
 # Run the test code
 all: $(exec)
 	./$(exec)
-
-# Check for compilation warnings
-check: 
-	make $(libname) CFLAGS="-Wall"
 
 clean:
 	rm -r $(exec) $(libname) *.o

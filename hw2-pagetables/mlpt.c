@@ -7,11 +7,11 @@
 #include "allocate.h"
 #include "translate.h"
 
+// Constants
 const size_t invalid_address = ~0;
 
-void map_table(size_t vpn, size_t ppn) {
-    root_table[vpn] = ppn << POBITS;
-}
+// Globals
+size_t *root_table = 0;
 
 size_t translate(size_t va) {
     printf("Translating virtual address 0x%lx:\n", va);
@@ -21,8 +21,6 @@ size_t translate(size_t va) {
         printf("- Physical address = 0x%lx\n", invalid_address);
         printf("\n");
         return invalid_address;
-    } else {
-        root_table = (size_t *) ptbr;
     }
 
     size_t vpn = get_page_number(va);
@@ -51,7 +49,6 @@ size_t translate(size_t va) {
 
     size_t phys_addr = page_addr + page_off;
     printf("- Physical address = 0x%lx\n", phys_addr);
-    // printf("- Physical address + ptbr = 0x%lx\n", p_add + ptbr);
     
     printf("\n");
     return phys_addr;
@@ -60,14 +57,7 @@ size_t translate(size_t va) {
 void page_allocate(size_t va) {
     // Check if base table is allocated
     if (ptbr == 0) {
-        create_root_table();
-
-        // Map example pages
-        map_table(0x0, 0x001);
-        map_table(0x1, 0x000);
-        map_table(0x2, 0x011);
-        map_table(0x123, 0xabc);
-        map_table(0x124, 0xdef);
+        root_table = create_root_table();
     }
 
     printf("Allocating address 0x%lx:\n", va);
@@ -84,10 +74,14 @@ void page_allocate(size_t va) {
         printf("- Page is invalid\n");
 
         // Allocate the page
-        root_table[vpn] |= 1;
+        size_t ppn = create_page(vpn);
+
+        // Set the page as valid
+        size_t pte = (ppn << POBITS) | 1;
+        root_table[vpn] = pte;
         printf("- Allocated page 0x%lx\n", vpn); 
 
-        size_t ppn = get_page_number(pte);
+        // size_t ppn = get_page_number(pte);
         printf("- Physical page number = 0x%lx\n", ppn); 
     }
 
