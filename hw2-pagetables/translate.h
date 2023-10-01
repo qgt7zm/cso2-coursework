@@ -1,28 +1,10 @@
 #include <stdio.h>
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef TRANSLATE_H
+#define TRANSLATE_H
 
 /** The number of bits for the page number in an entry, equal to 64 - POBITS. */
 extern const int pn_bits;
-
-/** The number of bits in a page table, equal to 2^POBITS bits. */
-extern const int table_size_bits;
-
-/** The number of entries in a page table, equal to (2^POBITS) / 8 bytes. */
-extern const int table_size_bytes;
-
-/** The pointer to the root table (ptbr). */
-extern size_t* root_table;
-
-/** Sets ptbr to 0. */
-void initialize();
-
-/** Sets ptbr as a pointer to the root array. */
-void set_ptbr(size_t root_table[]);
-
-/** Create the root page table and set ptbr. */
-void create_table();
 
 /** 
  * Get the virtual page number of an address or entry, equal to the first

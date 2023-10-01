@@ -4,9 +4,9 @@ LDFLAGS = ""
 
 libname = libmlpt.a
 exec := test
-headers := config.h mlpt.h
+headers := config.h mlpt.h allocate.o
 
-$(libname): mlpt.o util.o
+$(libname): mlpt.o translate.o allocate.o
 	ar rcs $@ $^	
 
 $(exec): test.o $(libname)
@@ -15,9 +15,10 @@ $(exec): test.o $(libname)
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-test.o: config.h $(headers)
-mlpt.o: config.h $(headers)
-util.o: util.h
+test.o: $(headers)
+mlpt.o: $(headers)
+allocate.o: $(headers)
+translate.o: $(headers)
 
 .PHONY: all check clean
 

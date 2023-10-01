@@ -1,7 +1,8 @@
 #include "config.h"
 #include "mlpt.h"
 
-#include "util.h"
+#include "allocate.h"
+#include "translate.h"
 
 #include <stdio.h>
 #include <stdlib.h>
