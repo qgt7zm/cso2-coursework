@@ -22,7 +22,7 @@ size_t get_page_offset(size_t address);
  * Whether an page table entry points to valid page or table, according to
  * the last bit in an entry.
  */
-int is_valid(size_t entry);
+int is_page_valid(size_t entry);
 
 /** 
  * Get the base address of a physical page number, equal to page_num * 2^POBITS.

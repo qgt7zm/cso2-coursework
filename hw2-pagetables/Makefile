@@ -4,7 +4,7 @@ LDFLAGS = ""
 
 libname = libmlpt.a
 exec := test
-headers := config.h mlpt.h allocate.o
+headers := config.h mlpt.h allocate.o translate.h
 
 $(libname): mlpt.o translate.o allocate.o
 	ar rcs $@ $^	

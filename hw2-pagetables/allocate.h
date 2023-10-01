@@ -22,9 +22,6 @@ extern size_t* root_table;
 void initialize();
 
 /** Create the root page table and set ptbr. */
-void create_table();
-
-/** Sets ptbr as a pointer to the root array. */
-void set_ptbr(size_t root_table[]);
+void create_root_table();
 
 #endif

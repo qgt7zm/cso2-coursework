@@ -21,7 +21,7 @@ size_t get_page_offset(size_t address) {
     return (address << pn_bits) >> pn_bits;
 }
 
-int is_valid(size_t entry) {
+int is_page_valid(size_t entry) {
     return entry & 1;
 }
 

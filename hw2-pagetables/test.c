@@ -7,19 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void test_translate() {
-    root_table = (size_t *) ptbr;
-
-    if (root_table) {
-        root_table[0x0] = 0x001001;
-        root_table[0x1] = 0x000001;
-        root_table[0x2] = 0x011001;
-
-        root_table[0x123] = 0xabc001;
-        root_table[0x124] = 0xdef000;
-    }
-
-    printf("\n");
+void test() {
+    page_allocate(0x000008);
+    page_allocate(0x123456);
 
     translate(0x000000); // Page 0x0, 0x000000
     translate(0x000008); // Page 0x0, 0x000008
@@ -31,9 +21,7 @@ void test_translate() {
 
 int main(int argc, char *argv[]) {
     initialize();
-
-    create_table();
-    test_translate();
+    test();
 
     printf("Program completed.\n");
     return 0;
