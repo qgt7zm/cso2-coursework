@@ -28,6 +28,7 @@ void initialize() {
     ptbr = 0;
     printf("Set ptbr = 0.\n");
     printf("Levels = %d, Pobits = %d\n", LEVELS, POBITS);
+    printf("VPN bits = %d per part\n", vpn_bits);
     printf("Page table size = %d (0x%x) bytes\n", table_size_bytes, table_size_bytes);
     printf("\n");
 }
@@ -60,6 +61,6 @@ size_t create_page(size_t vpn) {
     }
     size_t page_address = (size_t) &page[0];
 
-    size_t ppn = get_page_number(page_address);
+    size_t ppn = get_ppn(page_address);
     return ppn;
 }

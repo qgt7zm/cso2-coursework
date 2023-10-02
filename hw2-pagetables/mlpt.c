@@ -23,31 +23,25 @@ size_t translate(size_t va) {
         return invalid_address;
     } 
 
-    size_t vpn = get_page_number(va);
-    printf("- Virtual page number = 0x%lx\n", vpn);
-
-    size_t page_off = get_page_offset(va);
-    printf("- Page offset = 0x%lx\n", page_off);
+    size_t vpn = get_vpn(va, 1);
+    printf("- Virtual page number = 0x%lx", vpn);
 
     size_t pte = get_root_table()[vpn];
     // printf("- Page entry = 0x%lx\n", pte);
 
     if (is_page_valid(pte)) {
-        printf("- Page is valid\n");
+        printf(" (valid)\n");
     } else {
-        printf("- Page is invalid\n");
+        printf(" (invalid)\n");
         printf("- Physical address = 0x%lx\n", invalid_address);
         printf("\n");
         return invalid_address;
     }
 
-    size_t ppn = get_page_number(pte);
+    size_t ppn = get_ppn(pte);
     printf("- Physical page number = 0x%lx\n", ppn);
 
-    size_t page_addr = get_page_address(ppn);
-    // printf("- Page address = 0x%lx\n", page_add);
-
-    size_t phys_addr = page_addr + page_off;
+    size_t phys_addr = get_page_address(ppn) + get_page_offset(va);
     printf("- Physical address = 0x%lx\n", phys_addr);
     
     printf("\n");
@@ -63,7 +57,7 @@ void page_allocate(size_t va) {
     printf("Allocating address 0x%lx:\n", va);
 
     // Check if virtual page is valid
-    size_t vpn = get_page_number(va);
+    size_t vpn = get_vpn(va, 1);
     printf("- Virtual page number = 0x%lx\n", vpn);
 
     size_t pte = get_root_table()[vpn];
@@ -81,7 +75,7 @@ void page_allocate(size_t va) {
         get_root_table()[vpn] = pte;
         printf("- Allocated page 0x%lx\n", vpn); 
 
-        // size_t ppn = get_page_number(pte);
+        // size_t ppn = get_ppn(pte);
         printf("- Physical page number = 0x%lx\n", ppn); 
     }
 
