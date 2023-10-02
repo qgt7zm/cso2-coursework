@@ -10,7 +10,10 @@ The following internet resources were also consulted:
 - Apache License, Version 2.0: https://apache.org/licenses/LICENSE-2.0
 - GNU GPLv3: https://www.gnu.org/licenses/gpl-3.0.en.html
 - MIT License: https://mit-license.org/
-- StackOverflow, "What does posix_memalign/memalign do": https://stackoverflow.com/questions/6563120/what-does-posix-memalign-memalign-do
+- StackOverflow, "What does posix_memalign/memalign do":
+  https://stackoverflow.com/questions/6563120/what-does-posix-memalign-memalign-do
+- StackOverflow, "How can I access a specific group of bits from a variable?":
+  https://stackoverflow.com/questions/4415084/how-can-i-access-a-specific-group-of-bits-from-a-variable
 - Wikipedia, "Free-software license": https://en.wikipedia.org/wiki/Free-software_license
 - Wikipedia, "Permissive software": https://en.wikipedia.org/wiki/Permissive_software_license
 - Wikipedia, "Copyleft": https://en.wikipedia.org/wiki/Copyleft

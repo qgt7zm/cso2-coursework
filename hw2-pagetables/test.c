@@ -54,7 +54,13 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i <= LEVELS; i++) {
         size_t vpn = get_vpn(va, i);
         printf("- VPN part %d = 0x%lx\n", i, vpn);
-        printf("\n");
+    }
+#endif
+#if LEVELS == 4
+    size_t va = 0x55e3fb4246789456;  // vpns 0xabc 0xfed 0x789, 0x123
+    for (int i = 1; i <= LEVELS; i++) {
+        size_t vpn = get_vpn(va, i);
+        printf("- VPN part %d = 0x%lx\n", i, vpn);
     }
 #endif
 
