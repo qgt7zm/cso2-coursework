@@ -13,15 +13,15 @@ extern const int table_size_entries;
 
 // Globals
 
-/** The pointer to the root table (ptbr). */
-extern size_t *root_table;
+/** Returns the pointer to the root table (ptbr). */
+size_t *get_root_table();
 
 // Allocation Functions
 
 /** Prints out debug information and sets ptbr to 0. */
 void initialize();
 
-/** Creates the root page table, and sets ptbr and root_table. */
+/** Creates the root page table and sets ptbr. */
 void create_root_table();
 
 /**

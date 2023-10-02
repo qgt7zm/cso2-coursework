@@ -13,7 +13,14 @@ const int table_size_entries = 2 << (POBITS - 4); // 1 * 2^POBITS / 8
 
 // Globals
 size_t ptbr;
-size_t *root_table = 0;
+static size_t *root_table = 0;
+
+size_t *get_root_table() {
+    if (root_table == 0) {
+        root_table = (size_t *) ptbr;
+    }
+    return root_table;
+}
 
 // Allocation Functions
 
@@ -27,12 +34,16 @@ void initialize() {
 
 void create_root_table() {
     if (ptbr != 0) {
-        root_table = (size_t *) ptbr;
+        return;
     }
 
     printf("Creating root page table:\n");
 
-    posix_memalign((void *)(&root_table), table_size_bytes, table_size_bytes);
+    int err = posix_memalign((void *)(&root_table), table_size_bytes, table_size_bytes);
+    if (err != 0) {
+        printf("Error while creating root table.\n");
+        exit(1);
+    }
     ptbr = (size_t) &root_table[0];
     root_table = (size_t *) ptbr;
     
@@ -42,7 +53,11 @@ void create_root_table() {
 
 size_t create_page(size_t vpn) {
     size_t *page = 0;    
-    posix_memalign((void *)(&page), table_size_bytes, table_size_bytes);
+    int err = posix_memalign((void *)(&page), table_size_bytes, table_size_bytes);
+    if (err != 0) {
+        printf("Error while allocating page.\n");
+        exit(1);
+    }
     size_t page_address = (size_t) &page[0];
 
     size_t ppn = get_page_number(page_address);

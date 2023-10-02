@@ -11,6 +11,8 @@
 // Constants
 const size_t invalid_address = ~0;
 
+// Functions
+
 size_t translate(size_t va) {
     printf("Translating virtual address 0x%lx:\n", va);
 
@@ -19,9 +21,7 @@ size_t translate(size_t va) {
         printf("- Physical address = 0x%lx\n", invalid_address);
         printf("\n");
         return invalid_address;
-    } else {
-        root_table = (size_t *) ptbr;
-    }
+    } 
 
     size_t vpn = get_page_number(va);
     printf("- Virtual page number = 0x%lx\n", vpn);
@@ -29,7 +29,7 @@ size_t translate(size_t va) {
     size_t page_off = get_page_offset(va);
     printf("- Page offset = 0x%lx\n", page_off);
 
-    size_t pte = root_table[vpn];
+    size_t pte = get_root_table()[vpn];
     // printf("- Page entry = 0x%lx\n", pte);
 
     if (is_page_valid(pte)) {
@@ -66,7 +66,7 @@ void page_allocate(size_t va) {
     size_t vpn = get_page_number(va);
     printf("- Virtual page number = 0x%lx\n", vpn);
 
-    size_t pte = root_table[vpn];
+    size_t pte = get_root_table()[vpn];
     int valid = is_page_valid(pte);
     if (valid) {
         printf("- Page is valid\n");
@@ -78,7 +78,7 @@ void page_allocate(size_t va) {
 
         // Set the page as valid
         size_t pte = (ppn << POBITS) | 1;
-        root_table[vpn] = pte;
+        get_root_table()[vpn] = pte;
         printf("- Allocated page 0x%lx\n", vpn); 
 
         // size_t ppn = get_page_number(pte);
