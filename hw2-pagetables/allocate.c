@@ -26,7 +26,7 @@ size_t *get_root_table() {
 
 void initialize() {
     ptbr = 0;
-    printf("Set ptbr = 0.\n");
+    printf("Set ptbr = 0\n");
     printf("Levels = %d, Pobits = %d\n", LEVELS, POBITS);
     printf("VPN bits = %d per part\n", vpn_bits);
     printf("Page table size = %d (0x%x) bytes\n", table_size_bytes, table_size_bytes);

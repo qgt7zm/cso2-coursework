@@ -19,19 +19,12 @@ size_t get_vpn(size_t va, int level) {
     const int end_bit = start_bit + vpn_bits - 1; // end bit of vpn part
     const int bits_after_ = ADDRESS_BITS - (end_bit + 1); // bits after vpn part
 
-    // printf("Virtual address = 0x%lx\n", va);
     // printf("- Start = %d, End = %d\n", start_bit, end_bit);
     
     size_t va_shifted = va >> bits_after_; // Remove bits after vpn part
-    // printf("- After shift = 0x%0.16lx\n", va_shifted);
 
-    // Remove bits before vpn part
-    const size_t bitmask = ~(all_ones << (vpn_bits));
-    // printf("- Bitmask = 0x%0.16lx\n", bitmask);
-
-    size_t vpn = va_shifted & bitmask;
-    // printf("- After bitmask = 0x%lx\n", vpn);
-    return vpn;
+    const size_t bitmask = ~(all_ones << (vpn_bits)); // Remove bits before vpn part
+    return va_shifted & bitmask;
 }
 
 size_t get_page_offset(size_t address) {
@@ -47,5 +40,6 @@ size_t get_ppn(size_t pa) {
 }
 
 size_t get_page_address(size_t ppn) {
-    return ppn << POBITS;
+    return ppn << POBITS; // use table size?
+    // return ppn * table_size_entries; // use table size?
 }
