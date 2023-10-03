@@ -5,24 +5,25 @@
 
 // Constants
 
-/** The number of bytes in a page table, equal to (2^POBITS) bytes. */
-extern const int table_size_bytes;
+/** The size of a page table or page, equal to 2^POBITS bytes. */
+#define TABLE_SIZE_BYTES 2 << (POBITS - 1)
 
-/** The number of entries in a page table, equal to 2^POBITS / 8. */
-extern const int table_size_entries;
-
-// Globals
+// Allocation Functions
 
 /** Returns the pointer to the root table (ptbr). */
 size_t *get_root_table();
-
-// Allocation Functions
 
 /** Prints out debug information and sets ptbr to 0. */
 void initialize();
 
 /** Creates the root page table and sets ptbr. */
 void create_root_table();
+
+/**
+ * Initializes a table on the heap using posix_memalign, sets the memory to zero,
+ * and returns the address of the table.
+ */
+size_t allocate_table(size_t *table);
 
 /**
  * Allocates a page under the given virtual page number and returns the

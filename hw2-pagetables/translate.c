@@ -8,9 +8,8 @@
 #include "translate.h"
 
 // Constants
-const int ppn_bits = ADDRESS_BITS - POBITS; // todo use #define?
-// const int vpn_bits = (ADDRESS_BITS - POBITS) / LEVELS;
-const int vpn_bits = POBITS - 3; // log_2(2^POBITS / 2^3) bits per VPN
+const int ppn_bits = ADDRESS_BITS - POBITS; // Bits per PPN, ADDRESS_BITS - POBITS
+const int vpn_bits = POBITS - 3; // Bits per VPN part, POBITS - 3
 const size_t all_ones = ~0;
 
 // Translation Functions
@@ -40,6 +39,5 @@ size_t get_ppn(size_t pa) {
 }
 
 size_t get_page_address(size_t ppn) {
-    return ppn << POBITS; // use table size?
-    // return ppn * table_size_entries; // use table size?
+    return ppn << POBITS;
 }

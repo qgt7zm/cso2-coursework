@@ -7,21 +7,7 @@
 #include "allocate.h"
 #include "translate.h"
 
-void allocate_manual(size_t vpn, size_t ppn) {
-    if (ptbr == 0) {
-        create_root_table();
-    }
-
-    printf("Manually allocating page:\n");
-    printf("- Allocated page 0x%lx\n", vpn); 
-    printf("- Physical page number = 0x%lx\n", ppn); 
-    printf("\n");
-
-    size_t pte = (ppn << POBITS) | 1;
-    get_root_table()[vpn] = pte;
-}
-
-void allocate_manual_multi_level(size_t va) {
+void allocate_manual(size_t va) {
     if (ptbr == 0) {
         create_root_table();
     }
@@ -44,7 +30,7 @@ void allocate_manual_multi_level(size_t va) {
         } else {
             printf(" (invalid)\n");
             
-            printf("- Allocated page 0x%lx\n", vpn);
+            printf("- Allocated VPN 0x%lx\n", vpn);
             ppn = create_page(vpn);
             
             pte = (ppn << POBITS) | 1;
@@ -60,8 +46,8 @@ void allocate_manual_multi_level(size_t va) {
 
 void test_1_layer() {
     // Manually allocate
-    allocate_manual(0x0, 0x0);
-    allocate_manual(0x123, 0x0ab);
+    allocate_manual(0x000000);
+    allocate_manual(0x123456);
 
     // Pre-allocate
     page_allocate(0x000000);
@@ -80,7 +66,7 @@ void test_1_layer() {
 
 void test_2_layers() {
     size_t va1 = 0x15723456; // vpns 0x0ab, 0x123
-    allocate_manual_multi_level(va1);
+    allocate_manual(va1);
     page_allocate(va1);
     translate(va1);
 

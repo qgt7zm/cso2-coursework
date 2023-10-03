@@ -3,16 +3,10 @@
 #ifndef TRANSLATE_H
 #define TRANSLATE_H
 
+/** The number of bits in an address, equal to 64. */
 #define ADDRESS_BITS 64
 
-/** The number of bits for the physical page number in a page table entry, equal to 64 - POBITS. */
-extern const int ppn_bits;
-
-/**
- * The number of bits for each virtual page number part in a virtual address, equal to
- * POBITS - 3.
- */
-extern const int vpn_bits;
+// Translation Functions
 
 /** 
  * Get the virtual page number part of a virtual address for the given level, 

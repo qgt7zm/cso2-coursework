@@ -26,37 +26,22 @@ size_t translate(size_t va) {
     // Check if base table is allocated
     if (ptbr == 0) {
         printf("- Error: Root page table not allocated yet.\n");
-        // return 0x2; // reaches here on translate w/ allocate
         return print_invalid_address();
     }
 
     size_t phys_addr;
     size_t *table = get_root_table();
 
-    for (int level = 1; level <= LEVELS; level++) {
-        // printf("- Level %d table = 0x%p\n", level, table);
-        
-        // Check if table is present for manual allocation
-        if (table == 0) {
-            printf("- Error: Level %d table not allocated yet.\n", level);
-            // return 0x3; // doesn't reach here
-            return print_invalid_address();
-        }
-        
+    for (int level = 1; level <= LEVELS; level++) {       
         size_t vpn = get_vpn(va, level);
         printf("- VPN part %d = 0x%lx", level, vpn);
 
         size_t pte = table[vpn];
-        // printf("- Page entry = 0x%lx", pte);
 
         if (is_page_valid(pte)) {
             printf(" (valid)\n");
-            // if (level < LEVELS) {
-            //     return 0x50 + level; // reaches here on translate w/ manual allocate
-            // }
         } else {
             printf(" (invalid)\n");
-            // return 0x4; // reaches here on translate w/ manual allocate
             return print_invalid_address();
         }
 
@@ -68,9 +53,9 @@ size_t translate(size_t va) {
             // Add page offset to final page
             phys_addr += get_page_offset(va);
         }
-        // printf("- Physical address = 0x%lx\n", phys_addr);
         
-        table = (size_t *) phys_addr; // Address of next table
+        // Address of next table
+        table = (size_t *) phys_addr;
     }
 
     printf("- Physical address = 0x%lx\n", phys_addr);
@@ -91,8 +76,6 @@ void page_allocate(size_t va) {
     size_t *table = get_root_table();
 
     for (int level = 1; level <= LEVELS; level++) {
-        // printf("- Level %d table = 0x%p\n", level, table);
-
         // Check if table is present for manual allocation
         if (table == 0) {
             printf("- Error: Level %d table not allocated yet.\n", level);
@@ -118,9 +101,8 @@ void page_allocate(size_t va) {
             // Set the page as valid
             size_t pte = (ppn << POBITS) | 1;
             table[vpn] = pte;
-            printf("- Allocated page 0x%lx\n", vpn); 
+            printf("- Allocated VPN 0x%lx\n", vpn); 
 
-            // size_t ppn = get_ppn(pte);
             printf("- Level %d PPN = 0x%lx\n", level, ppn); 
         }
 
