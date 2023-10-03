@@ -1,13 +1,41 @@
 Multi-Level Page Table
 
+1. Functionality
 This program implements a multi-level page table for translating
-virtual addresses into physical addresses.
+virtual addresses into physical addresses. All addresses in this
+program are stored as 64-bit (8-byte) integers. All page table
+entries are also stored as 64-bit integers.
 
+The header file "mlpt.h" specifies the functions and variables
+provided by this library. The function "translate(va)" takes a
+virtual address, passes it through the page table, and outputs
+a physical address. If the virtual address is not present in the
+table, then "translate" will return a number whose bits are all 1.
+
+Next, the function "page_allocate(va)" allocates a physical address
+for the given virtual address, creating any necessary page tables and
+pages on the heap. Any structures already allocated will not be
+modified.
+
+Lastly, the variable "ptbr" stores the page table base register
+(address of the root page table) as an integer. Initially, "ptbr"
+is set to 0, and the first allocation will set to something else.
+
+2. Configuration
 The header file "config.h" stores program parameters. The constant
-"LEVELS" controls how many levels the page table has. A value of 1
-means the page table is stored as an array. A higher value means
-the page table is stored as a tree.
+"LEVELS" controls how many levels of page tables the program contains.
+A value of 1 means there is one root page table that maps to multiple 
+pages. A higher value means there are levels of intermediate page tables
+that map to other page tables.
 
 The constant "POBITS" affects how many bits are in the page offset
-for a virtual address. Each page table will also have the same number
-of bytes.
+for a virtual address. In turn, the number of entries per page table
+will be 2^POBIT. Virtual page number parts will have (2^POBITS) / 8
+bits, while physical page numbers will have 64 - POBITS bytes.
+
+3. Building
+The included Makefile contains several build targets. The default target
+compiles the library, "libmlpt.a." The target "test" also statically links
+the library to a test executable that calls the functions. The target "all"
+automaticallys run the test program, and the target "clean" removes all 
+compiled files.
