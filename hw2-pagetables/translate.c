@@ -8,21 +8,21 @@
 #include "translate.h"
 
 // Constants
-const int ppn_bits = ADDRESS_BITS - POBITS; // todo put in header?
-const int vpn_bits = (ADDRESS_BITS - POBITS) / LEVELS;
+const int ppn_bits = ADDRESS_BITS - POBITS; // todo use #define?
+// const int vpn_bits = (ADDRESS_BITS - POBITS) / LEVELS;
+const int vpn_bits = POBITS - 3; // log_2(2^POBITS / 2^3) bits per VPN
 const size_t all_ones = ~0;
 
 // Translation Functions
 
 size_t get_vpn(size_t va, int level) {
-    const int start_bit = vpn_bits * (level - 1); // start bit of vpn part
-    const int end_bit = start_bit + vpn_bits - 1; // end bit of vpn part
-    const int bits_after_ = ADDRESS_BITS - (end_bit + 1); // bits after vpn part
-
+    const int bits_after = POBITS + vpn_bits * (LEVELS - level); // bits after vpn part
+    
+    // const int end_bit = (ADDRESS_BITS - 1) - bits_after; // end bit of vpn part
+    // const int start_bit = end_bit - (vpn_bits - 1); // start bit of vpn part    
     // printf("- Start = %d, End = %d\n", start_bit, end_bit);
     
-    size_t va_shifted = va >> bits_after_; // Remove bits after vpn part
-
+    size_t va_shifted = va >> bits_after; // Remove bits after vpn part
     const size_t bitmask = ~(all_ones << (vpn_bits)); // Remove bits before vpn part
     return va_shifted & bitmask;
 }

@@ -12,7 +12,7 @@
 const size_t invalid_address = ~0;
 
 // Helper Functions
-size_t show_invalid_page_error() {
+size_t print_invalid_address() {
     printf("- Physical address = 0x%lx\n", invalid_address);
     printf("\n");
     return invalid_address;
@@ -26,7 +26,8 @@ size_t translate(size_t va) {
     // Check if base table is allocated
     if (ptbr == 0) {
         printf("- Error: Root page table not allocated yet.\n");
-        return show_invalid_page_error();
+        // return 0x2; // reaches here on translate w/ allocate
+        return print_invalid_address();
     }
 
     size_t phys_addr;
@@ -38,7 +39,8 @@ size_t translate(size_t va) {
         // Check if table is present for manual allocation
         if (table == 0) {
             printf("- Error: Level %d table not allocated yet.\n", level);
-            return show_invalid_page_error();
+            // return 0x3; // doesn't reach here
+            return print_invalid_address();
         }
         
         size_t vpn = get_vpn(va, level);
@@ -49,9 +51,13 @@ size_t translate(size_t va) {
 
         if (is_page_valid(pte)) {
             printf(" (valid)\n");
+            // if (level < LEVELS) {
+            //     return 0x50 + level; // reaches here on translate w/ manual allocate
+            // }
         } else {
             printf(" (invalid)\n");
-            return show_invalid_page_error();
+            // return 0x4; // reaches here on translate w/ manual allocate
+            return print_invalid_address();
         }
 
         size_t ppn = get_ppn(pte);

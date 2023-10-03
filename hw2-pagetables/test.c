@@ -61,7 +61,7 @@ void allocate_manual_multi_level(size_t va) {
 void test_1_layer() {
     // Manually allocate
     allocate_manual(0x0, 0x0);
-    // allocate_manual(0x123, 0xabc);
+    allocate_manual(0x123, 0x0ab);
 
     // Pre-allocate
     page_allocate(0x000000);
@@ -71,25 +71,25 @@ void test_1_layer() {
     // Translate allocated
     translate(0x000000); // Page 0x0, 0x[ppn]000
     translate(0x000008); // Page 0x0, 0x[ppn]008
-    translate(0x123456); // Page 0x123, 0x[ppn]456
+    translate(0x123456); // Page 0xab, 0x[ppn]456
 
     // Translate unallocated
     translate(0x002004); // Page 0x2, invalid
-    translate(0x124789); // Page 0x124, invalid
+    translate(0x124789); // Page invalid
 }
 
 void test_2_layers() {
-    size_t va1 = 0x2af0000123456; // vpns 0xabc, 0x123
-
+    size_t va1 = 0x15723456; // vpns 0x0ab, 0x123
     allocate_manual_multi_level(va1);
-    // size_t va2 = 0x2af0000124987; // vpns 0xabc, 0x124
     page_allocate(va1);
-    // page_allocate(va2);
     translate(va1);
-    // translate(va2);
 
-    // size_t va3 = 0x2af0000125000; // vpns 0xabc, 0x125
-    // translate(va3);
+    size_t va2 = 0x15724987; // vpns 0x0ab, 0x124
+    page_allocate(va2);
+    translate(va2);
+
+    size_t va3 = 0x15725000; // vpns 0x0ab, 0x125, invalid
+    translate(va3);
 }
 
 int main(int argc, char *argv[]) {
@@ -101,18 +101,18 @@ int main(int argc, char *argv[]) {
     test_1_layer();
 #endif
 #if LEVELS == 2
-    // size_t va = 0x2af0000123456; // vpns 0xabc, 0x123
+    // size_t va = 0x15723000; // vpns 0x0ab, 0x123
     // for (int i = 1; i <= LEVELS; i++) {
     //     size_t vpn = get_vpn(va, i);
-    //     printf("- VPN part %d = 0x%lx\n", i, vpn);
+    //     printf("- VPN part %d = 0x%0.3lx\n", i, vpn);
     // }
     test_2_layers();
 #endif
 #if LEVELS == 4
-    size_t va = 0x55e3fb4246789456;  // vpns 0xabc 0xfed 0x789, 0x123
+    size_t va = 0x77b715723000;  // vpns 0x0ef, 0x0dc, 0x0ab, 0x123
     for (int i = 1; i <= LEVELS; i++) {
         size_t vpn = get_vpn(va, i);
-        printf("- VPN part %d = 0x%lx\n", i, vpn);
+        printf("- VPN part %d = 0x%0.3lx\n", i, vpn);
     }
 #endif
 

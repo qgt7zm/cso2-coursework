@@ -10,7 +10,7 @@ extern const int ppn_bits;
 
 /**
  * The number of bits for each virtual page number part in a virtual address, equal to
- * (64 - POBITS) / LEVELS.
+ * POBITS - 3.
  */
 extern const int vpn_bits;
 
