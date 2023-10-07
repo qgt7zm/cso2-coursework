@@ -24,4 +24,11 @@ size_t translate(size_t va);
  */
 void page_allocate(size_t va);
 
+/**
+ * Frees the physical page corresponding to the virtual address such that
+ * translating the virtual address is invalid.
+ * If such a page has not been allocated, does nothing.
+ */
+void page_deallocate(size_t va);
+
 #endif

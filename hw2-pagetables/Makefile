@@ -22,7 +22,7 @@ translate.o: $(headers)
 
 .PHONY: all clean
 
-# Run the test code
+# Run the test code and check for warnings
 all: $(exec)
 	./$(exec)
 

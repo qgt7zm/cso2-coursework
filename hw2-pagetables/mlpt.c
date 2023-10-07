@@ -61,7 +61,6 @@ size_t translate(size_t va) {
     printf("- Physical address = 0x%lx\n", phys_addr);
     printf("\n");
 
-    
     return phys_addr;
 }
 
@@ -112,4 +111,52 @@ void page_allocate(size_t va) {
 
     printf("\n");
     return;
+}
+
+void page_deallocate(size_t va) {
+    // Make sure base table is allocated
+    if (ptbr == 0) {
+        return;
+    }
+
+    printf("Deallocating address 0x%lx:\n", va);
+
+    size_t *table = get_root_table();
+    size_t phys_addr;
+
+    for (int level = 1; level <= LEVELS; level++) {       
+        size_t vpn = get_vpn(va, level);
+        printf("- VPN part %d = 0x%lx", level, vpn);
+
+        size_t pte = table[vpn];
+
+        if (is_page_valid(pte)) {
+            printf(" (valid)\n");
+        } else {
+            printf(" (invalid)\n");
+            printf("\n");
+            return;
+        }
+
+        size_t ppn = get_ppn(pte);
+        printf("- PPN level %d = 0x%lx\n", level, ppn);
+
+        phys_addr = get_page_address(ppn); 
+
+        // Reached the final level
+        if (level == LEVELS) {
+            // Deallocate the page
+            delete_page(ppn);
+
+            // Set the entry as invalid
+            table[vpn] -= 1;
+            printf("- Deallocated VPN 0x%lx\n", vpn); 
+            printf("\n");
+            return;
+        }
+
+        // Address of next table
+        table = (size_t *) phys_addr;
+    }
+
 }

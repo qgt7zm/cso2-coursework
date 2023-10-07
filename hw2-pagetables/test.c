@@ -54,6 +54,10 @@ void test_1_layer() {
     page_allocate(0x000008);
     page_allocate(0x123456);
 
+    // Deallocate
+    page_deallocate(0x000000);
+    page_deallocate(0x124789);
+
     // Translate allocated
     translate(0x000000); // Page 0x0, 0x[ppn]000
     translate(0x000008); // Page 0x0, 0x[ppn]008
@@ -72,9 +76,11 @@ void test_2_layers() {
 
     size_t va2 = 0x15724987; // vpns 0x0ab, 0x124
     page_allocate(va2);
+    page_deallocate(va2);
     translate(va2);
 
     size_t va3 = 0x15725000; // vpns 0x0ab, 0x125, invalid
+    page_deallocate(va3);
     translate(va3);
 }
 

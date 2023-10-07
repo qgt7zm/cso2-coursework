@@ -31,4 +31,9 @@ size_t allocate_table(size_t *table);
  */
 size_t create_page(size_t vpn);
 
+/**
+ * Deallocates the page under the given the physical page number.
+ */
+void delete_page(size_t ppn);
+
 #endif

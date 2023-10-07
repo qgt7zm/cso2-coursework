@@ -1,3 +1,4 @@
+#include <stddef.h>
 #define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,4 +60,11 @@ size_t create_page(size_t vpn) {
 
     size_t ppn = get_ppn(page_address);
     return ppn;
+}
+
+void delete_page(size_t ppn) {
+    size_t page_address = get_page_address(ppn);
+    size_t *page = (size_t *) page_address;
+    memset(page, 0, TABLE_SIZE_BYTES);
+    free(page);
 }

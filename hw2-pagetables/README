@@ -17,6 +17,13 @@ for the given virtual address, creating any necessary page tables and
 pages on the heap. Any structures already allocated will not be
 modified.
 
+Pages can also be deallocated using the "page_deallocate(va)", which
+will free the physical page for the given virtual address from the heap,
+if it exists. This operation will not delete any intermediate-level page
+tables, as that would require checking if all the entries in a table
+are invalid. Such a check would be inefficient without different data
+structures.
+
 Lastly, the variable "ptbr" stores the page table base register
 (address of the root page table) as an integer. Initially, "ptbr"
 is set to 0, and the first allocation will set to something else.
@@ -33,9 +40,17 @@ for a virtual address. In turn, the number of entries per page table
 will be 2^POBIT. Virtual page number parts will have (2^POBITS) / 8
 bits, while physical page numbers will have 64 - POBITS bytes.
 
+The values of "POBITS" or "LEVELS" should not be set too high. If "POBITS"
+and "LEVELS" are both too large, then there will no be enough bits to store
+the virtual page number. A general guide is to keep 
+(POBITS − 3) × (LEVELS + 1) > 60.
+
 3. Building
 The included Makefile contains several build targets. The default target
 compiles the library, "libmlpt.a." The target "test" also statically links
 the library to a test executable that calls the functions. The target "all"
 automaticallys run the test program, and the target "clean" removes all 
 compiled files.
+
+The library functions do not require any further setup and can be called directly
+from the main function with just a virtual address.
