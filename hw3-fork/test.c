@@ -7,18 +7,21 @@ char *parallelgetoutput(int count, const char **argv_base);
 
 int main() {
     // Test getoutput
-    printf("Hi!\n");
-    printf("Text: [[[%s]]]\n", getoutput("echo 1 2 3; sleep 2; echo 5 5"));
-    printf("Bye!\n");
-
     char *output1 = getoutput("echo Hello There; ls .");
     printf("%s\n", output1);
     free(output1);
 
+    printf("Hi!\n");
+    char *output2 = getoutput("echo 1 2 3; sleep 0.5; echo 5 5");
+    printf("Text: [[[%s]]]\n", output2);
+    printf("Bye!\n");
+    free(output2);  
+
     // Test parallelgetoutput
-    // const char *argv_base[] = {
-    //     "/bin/echo", "Hello there", NULL
-    // };
-    // char *output2 = parallelgetoutput(1, argv_base);
-    // printf("%s\n", output2);
+    const char *argv_base[] = {
+        "/bin/echo", "Hello there", NULL
+    };
+    char *output3 = parallelgetoutput(4, argv_base);
+    printf("%s\n", output3);
+    free(output3);
 }
