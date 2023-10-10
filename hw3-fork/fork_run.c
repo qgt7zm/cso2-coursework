@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 
 char *getoutput(const char *command) {
-
     // Create a pipe
     int pipe_fds[2];
     if (pipe(pipe_fds) < 0) {
@@ -21,44 +20,22 @@ char *getoutput(const char *command) {
         close(pipe_write);
         FILE *pipe_read_fd = fdopen(pipe_read, "r");
 
-        // Read lines
-        size_t line_size = 1024;
-        char *line = calloc(line_size + 1, sizeof(char));
-        int chars_read = 0;
+        // Read entire output
+        size_t output_size = 1024;
+        char *output = calloc(output_size + 1, sizeof(char));
 
-        // Store entire output
-        char *output = calloc(line_size + 1, sizeof(char));
-        size_t output_size = (int) line_size;
-        int output_chars = 0;
-
-        while ((chars_read = getdelim(&line, &line_size, '\n', pipe_read_fd))) {
-            // printf("Line = '%s'", line);
-            if (chars_read == -1) break; // End of file
-
-            // Append lines to output
-            output_chars += chars_read;
-            // printf("Size = '%d'\n", output_chars);
-
-            // Reallocate output
-            if (output_chars >= output_size) {
-                output_size += line_size;
-                output = realloc(output, output_size + 1);
-            }
-
-            strncat(output, line, output_size);
-            // printf("Output = '%s'\n", output);
-        }
+        getdelim(&output, &output_size, '\0', pipe_read_fd);
+        // printf("Output = '%s'", output);
         
         // Free resources
-        free(line);
         close(pipe_read);
-        
+
         int status;
         waitpid(pid, &status, 0);
 
         return output;
     } else {
-        // Child
+        // Child: Run process
         // Change stdout to pipe_out
         dup2(pipe_write, STDOUT_FILENO);
 

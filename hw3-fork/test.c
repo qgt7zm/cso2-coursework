@@ -15,6 +15,7 @@ int main() {
     printf("%s\n", output1);
     free(output1);
 
+    // Test parallelgetoutput
     // const char *argv_base[] = {
     //     "/bin/echo", "Hello there", NULL
     // };
