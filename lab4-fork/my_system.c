@@ -16,8 +16,8 @@ int my_system(const char *command) {
     } else {
         // Child
         // printf("Running '%s'\n", command);
-        printf(""); // doesn't run properly without a print
-        int err = execl("/bin/sh", "sh", "-c", command);
+        // printf(""); // doesn't run properly without a print
+        int err = execl("/bin/sh", "sh", "-c", command, NULL);
         return err;
     }
     return 0;
