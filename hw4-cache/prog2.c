@@ -70,7 +70,7 @@ void prevent_optimizations_based_on_knowing_array_values() {
 
 int main() {
     const int MAX = 1048568;
-    const int SKIP = 4;
+    const int SKIP = 1 << 16;
     const int ITERS = 64000000;
 
 /* these two lines tell Clang (if used to compile this) not to try to 
@@ -82,7 +82,7 @@ int main() {
     /* This loop sets up global_array[i] for the next loop.
      * Most of the accesses to the array are likely to happen in the second loop. */
     for (int i = 0; i < MAX; ++i) {
-        global_array[i] = (i+SKIP) % (MAX);
+        global_array[i] = (SKIP * (i % 3 + 1));
     }
     prevent_optimizations_based_on_knowing_array_values();
     int j = 0;
