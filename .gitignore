@@ -12,6 +12,9 @@
 *.a
 *.lib
 
+# Code analysis files
+*.dSYM
+
 # IDE files
 .vscode
 *.code-workspace

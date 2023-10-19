@@ -1,6 +1,3 @@
 # Executable files
 split
 test
-
-# Code analysis files
-split.dSYM
