@@ -1,2 +1,5 @@
 # Executable Files
 prog[123]
+
+# Archived files
+*.tar
