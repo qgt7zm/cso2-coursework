@@ -4,12 +4,6 @@
 
 #include "cacheutil.h"
 
-#define NUM_SETS 16
-#define NUM_WAYS 4
-
-#define INDEX_BITS 4
-#define TAG_BITS (64 - INDEX_BITS - POBITS)
-
 const size_t all_ones = -1;
 
 size_t get_vpn(size_t va) {

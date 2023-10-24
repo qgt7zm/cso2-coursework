@@ -23,6 +23,8 @@ void test_split_va(size_t va) {
 }
 
 void example1() {
+    puts("Example 1:");
+
     tlb_clear();
     // assert(tlb_peek(0) == 0);
     assert(tlb_translate(0) == 0x0020000);
@@ -50,9 +52,11 @@ void example1() {
     // assert(tlb_peek(0x0000000) == 0);
     assert(tlb_translate(0) == 0x20000);
     // assert(tlb_peek(0) == 1);
+    puts("");
 }
 
 void example2() {
+    puts("Example 2:");
     tlb_clear();
     assert(tlb_translate(0x0001200) == 0x0021200);
     assert(tlb_translate(0x2101200) == 0x2201200);
@@ -80,9 +84,11 @@ void example2() {
     // assert(tlb_peek(0x801000) == 0);
     // assert(tlb_peek(0xA01000) == 0);
     assert(tlb_translate(0xA01200) == 0xA21200);
+    puts("");
 }
 
 void example3() {
+    puts("Example 3:");
     tlb_clear();
     assert(tlb_translate(0xA0001200) == -1);
     // assert(tlb_peek(0xA0001000) == 0);
@@ -96,13 +102,23 @@ void example3() {
     assert(tlb_translate(0xE0001200) == -1);
     // assert(tlb_peek(0x1000) == 1);
     assert(tlb_translate(0x1200) == 0x21200);
+    puts("");
+}
+
+void test1() {
+    tlb_clear();
+    assert(tlb_translate(0) == 0x0020000);
+    assert(tlb_translate(0) == 0x0020000);
+    assert(tlb_translate(0) == 0x0020000);
+    assert(tlb_translate(0x10000) == 0x0030000);
+    assert(tlb_translate(0) == 0x0020000);
 }
 
 int main(int argc, char *argv[]) {
-    test_split_va(0xabc123);
-    example1();
-    example2();
-    example3();
+    // example1();
+    // example2();
+    // example3();
+    test1();
 
     printf("Program completed.\n");
     return 0;
