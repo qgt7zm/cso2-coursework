@@ -4,12 +4,12 @@ LDFLAGS = ""
 
 libname = libmlpt.a
 exec := test
-headers := config.h tlb.h mlpt.h
+headers := config.h tlb.h mlpt.h cacheutil.h
 
 $(libname): mlpt.o tlb.o
 	ar rcs $@ $^
 
-$(exec): test.o $(libname)
+$(exec): test.o cacheutil.o $(libname)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 .c.o:
