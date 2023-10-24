@@ -2,22 +2,14 @@ CC = clang
 CFLAGS = -Wall -g -Og
 LDFLAGS = ""
 
-libname = libmlpt.a
 exec := test
 headers := config.h tlb.h mlpt.h cacheutil.h
 
-$(libname): mlpt.o tlb.o
-	ar rcs $@ $^
-
-$(exec): test.o cacheutil.o $(libname)
+$(exec): test.o tlb.o cacheutil.o mlpt.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-.c.o:
+.c.o: $(headers)
 	$(CC) $(CFLAGS) -o $@ -c $<
-
-test.o: $(headers)
-mlpt.o: $(headers)
-tlb.o: $(headers)
 
 .PHONY: all clean
 
@@ -25,4 +17,4 @@ all: $(exec)
 	./$(exec)
 
 clean:
-	rm -r $(exec) $(libname) *.o
+	rm -r $(exec) *.o
