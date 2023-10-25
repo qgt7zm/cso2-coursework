@@ -15,7 +15,7 @@ void *eat(void *arg) {
     pthread_mutex_lock(&chopstick[(n+1)%5]);
     printf("Philosopher %d got chopstick %d\n", n, (n+1)%5);
     
-    printf ("Philosopher %d is eating\n",n);
+    printf("Philosopher %d is eating\n",n);
     sleep(1);
     
     // set them back down
