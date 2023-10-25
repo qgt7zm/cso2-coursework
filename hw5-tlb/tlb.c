@@ -8,87 +8,6 @@
 
 #include "cacheutil.h"
 
-tlb_set tlb_table[NUM_SETS];
-
-// Helper Functions
-
-/**
- * Get the set in the TLB cache at with the given index.
- */
-tlb_set *get_set(int index) {
-    return &(tlb_table[index]);
-}
-
-/**
- * Get the entry in the given set at the given way.
- */
-tlb_entry *get_entry(tlb_set *set, int way) {
-    return &(set->ways[way]);
-}
-
-/**
- * Get the least recently used way in the given set, or -1 if the set is empty.
- */
-int get_lru_way(tlb_set *set) {
-    for (int way = 0; way < set->size; way++) {
-        tlb_entry *entry = get_entry(set, way);
-        if (entry->used == set->size) {
-            return way;
-        }
-    }
-    return -1;
-}
-
-/**
- * Replaces the exisitng entry at the given way in the given set.
- */
-void replace_entry(tlb_set *set, int way, size_t tag, size_t ppn) {
-    tlb_entry *entry = get_entry(set, way);
-    entry->tag = tag;
-    entry->ppn = ppn;
-    printf("Replaced way %d\n", way);
-}
-
-/**
- * Adds a new entry to the given set.
- */
-void add_entry(tlb_set *set, size_t tag, size_t ppn) {
-    tlb_entry *entry = get_entry(set, set->size);
-    set->size += 1;
-
-    entry->valid = 1;
-    entry->tag = tag;
-    entry->ppn = ppn;
-    printf("Added way %d\n", set->size);
-}
-
-/**
- * Update the recently used order for each valid way in the set, and set the given way
- * as the most recently used.
- */
-void update_used_order(tlb_set *set, int mru_way) {
-    printf("MRU way: %d\n", mru_way);
-    int prev_used = get_entry(set, mru_way)->used; // Old value of LRU bit
-
-    for (int way = 0; way < set->size; way++) { // Ignore invalid ways
-        tlb_entry *entry = get_entry(set, way);
-        printf("Updating way %d:\n", way);
-        printf("- Old used order: %d\n", entry->used);
-
-        if (way == mru_way) {
-            // Set as most recently used
-            entry->used = 1; 
-        } else if (prev_used == 0)  {
-            // If adding a way increment all used values
-            entry->used += 1;
-        } else if (entry->used <= prev_used) {
-            // If replacing a way only increment more recently used
-            entry->used += 1;
-        }
-        printf("- New used order: %d\n", entry->used);
-    }
-}
-
 // TLB Functions
 
 void tlb_clear() {
@@ -105,7 +24,7 @@ int get_way(tlb_set *set, size_t tag) {
         printf("Way %d:\n", way);
         printf("- Valid: %d\n", entry->valid);
         printf("- Tag: 0x%lx\n", entry->tag);
-        printf("- Used: %d\n", entry->used);
+        printf("- Used: %d\n", entry->used_order);
 
         if (!entry->valid) {
             printf("- Set does not contain tag\n");
@@ -141,8 +60,8 @@ int tlb_peek(size_t va) {
         return 0;
     } else {
        tlb_entry *entry = get_entry(set, way);
-       printf("- Last used: %d\n", entry->used);
-       return entry->used;
+       printf("- Last used: %d\n", entry->used_order);
+       return entry->used_order;
     }
 }
 
@@ -183,7 +102,7 @@ size_t tlb_translate(size_t va) {
     } else {
         // VPN is present
         tlb_entry *entry = get_entry(set, way);
-        printf("- Last used: %d\n", entry->used);
+        printf("- Last used: %d\n", entry->used_order);
         ppn = entry->ppn;
     }
 
