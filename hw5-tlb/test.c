@@ -107,10 +107,13 @@ void example3() {
 
 void test1() {
     tlb_clear();
+    assert(tlb_peek(0) == 0);
     assert(tlb_translate(0) == 0x0020000);
+    assert(tlb_peek(0) == 1);
     assert(tlb_translate(0) == 0x0020000);
     assert(tlb_translate(0) == 0x0020000);
     assert(tlb_translate(0x10000) == 0x0030000);
+    assert(tlb_peek(0) == 0);
     assert(tlb_translate(0) == 0x0020000);
 }
 

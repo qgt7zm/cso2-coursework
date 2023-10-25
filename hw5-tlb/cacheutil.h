@@ -17,7 +17,11 @@ struct tlb_entry {
     int valid;
     size_t tag;
     size_t ppn;
-    int used; // how recently was used
+    int used; // how recently way was used
+};
+
+struct tlb_set {
+    struct tlb_entry ways[NUM_WAYS];
 };
 
 // Functions
