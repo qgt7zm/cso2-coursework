@@ -46,9 +46,9 @@ int tlb_peek(size_t va) {
     printf("Peeking at VA 0x%lx\n", va);
 
     // Get set at index for VA
-    size_t vpn = get_page_number(va);
-    size_t index = get_index(vpn);
-    size_t tag = get_tag(vpn);
+    const size_t vpn = get_page_number(va);
+    const size_t index = get_index(vpn);
+    const size_t tag = get_tag(vpn);
 
     printf("- Index: 0x%lx\n", index);
     printf("- Tag: 0x%lx\n", tag);
@@ -70,9 +70,9 @@ size_t tlb_translate(size_t va) {
     printf("Looking up VA 0x%lx\n", va);
 
     // Get set at index for VA
-    size_t vpn = get_page_number(va);
-    size_t index = get_index(vpn);
-    size_t tag = get_tag(vpn);
+    const size_t vpn = get_page_number(va);
+    const size_t index = get_index(vpn);
+    const size_t tag = get_tag(vpn);
 
     printf("- Index: 0x%lx\n", index);
     printf("- Tag: 0x%lx\n", tag);
@@ -81,16 +81,17 @@ size_t tlb_translate(size_t va) {
     tlb_set *set = get_set(index);
     int way = get_way(set, tag);
 
-    size_t pa;
     size_t ppn;
     if (way == -1) {
-        // VPN is not present
-        pa = translate(va);
+        // Look up if VPN is not present
+        const size_t va_aligned = get_page_address(get_page_number(va));
+        const size_t pa = translate(va_aligned);
         if (pa == -1) {
             return -1; // Don't update if VA is invalid
         }
 
-        ppn = get_page_number(pa);
+        // Align address with page
+        ppn = get_page_number(pa);    
 
         if (set->size < NUM_WAYS) {
             // Add a new way if set is not full
@@ -102,13 +103,14 @@ size_t tlb_translate(size_t va) {
             replace_entry(set, way, tag, ppn);
         }
     } else {
-        // VPN is present
-        tlb_entry *entry = get_entry(set, way);
+        // Use cache if VPN is present
+        const tlb_entry *entry = get_entry(set, way);
         printf("- Last used: %d\n", entry->used_order);
         ppn = entry->ppn;
-        pa = get_page_address(ppn) + get_page_offset(va);
     }
 
     update_used_order(set, way);
+    const size_t pa = get_page_address(ppn) + get_page_offset(va);
+    printf("PA = 0x%lx\n", pa);
     return pa;
 }

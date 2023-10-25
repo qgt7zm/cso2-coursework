@@ -48,7 +48,7 @@ tlb_entry *get_entry(tlb_set *set, int way) {
 
 int get_lru_way(tlb_set *set) {
     for (int way = 0; way < set->size; way++) {
-        tlb_entry *entry = get_entry(set, way);
+        const tlb_entry *entry = get_entry(set, way);
         if (entry->used_order == set->size) {
             return way;
         }
@@ -78,7 +78,7 @@ void add_entry(tlb_set *set, size_t tag, size_t ppn) {
 
 void update_used_order(tlb_set *set, int mru_way) {
     printf("MRU way: %d\n", mru_way);
-    int prev_used = get_entry(set, mru_way)->used_order; // Old value of LRU bit
+    const int prev_used = get_entry(set, mru_way)->used_order; // Old value of LRU bit
 
     for (int way = 0; way < set->size; way++) { // Ignore invalid ways
         tlb_entry *entry = get_entry(set, way);
