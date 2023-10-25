@@ -20,7 +20,7 @@ void release_chopstick(int p_index, int index) {
 
 void think(int p_index, int *min_wait, int *max_wait) {
     int wait_us = rand_int(*min_wait, *max_wait);
-    printf("Philosopher %d thinks for %d µs\n", p_index, wait_us);
+    printf("Philosopher %d is thinking\n", p_index);
     usleep(wait_us);
 
     // double next wait time
