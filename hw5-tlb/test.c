@@ -112,9 +112,9 @@ void test1() {
     assert(tlb_peek(0) == 1);
     assert(tlb_translate(0) == 0x0020000);
     assert(tlb_translate(0x10000) == 0x0030000);
-    // assert(tlb_peek(0x10000) == 1);
-    // assert(tlb_peek(0) == 1);
-    // assert(tlb_translate(0) == 0x0020000);
+    assert(tlb_peek(0x10000) == 1);
+    assert(tlb_peek(0) == 2);
+    assert(tlb_translate(0) == 0x0020000);
 }
 
 int main(int argc, char *argv[]) {
