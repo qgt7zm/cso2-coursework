@@ -20,10 +20,9 @@ typedef struct {
     int used; // how recently way was used
 } tlb_entry;
 
-// typedef tlb_entry tlb_set[NUM_WAYS];
-
 typedef struct {
     tlb_entry ways[NUM_WAYS];
+    int size; // number of valid ways
 } tlb_set;
 
 // Functions
