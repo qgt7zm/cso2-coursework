@@ -14,8 +14,17 @@ tlb_set tlb_table[NUM_SETS];
 
 // Bit Helper Functions
 
-size_t get_vpn(size_t va) {
-    return va >> POBITS; // Remove offset bits
+size_t get_page_number(size_t addr) {
+    return addr >> POBITS; // Remove offset bits
+}
+
+size_t get_page_address(size_t pn) {
+    return pn << POBITS; // Pad by offset bits
+}
+
+size_t get_page_offset(size_t addr) {
+    const size_t bitmask = ~(all_ones << POBITS); // Select offset bits
+    return addr & bitmask;
 }
 
 size_t get_tag(size_t vpn) {    
@@ -24,7 +33,6 @@ size_t get_tag(size_t vpn) {
 
 size_t get_index(size_t vpn) {    
     const size_t bitmask = ~(all_ones << INDEX_BITS); // Remove tag bits
-    // printf("Bitmask: 0x%lx\n", bitmask);
     return vpn & bitmask;
 }
 
@@ -54,6 +62,7 @@ void replace_entry(tlb_set *set, int way, size_t tag, size_t ppn) {
     tlb_entry *entry = get_entry(set, way);
     entry->tag = tag;
     entry->ppn = ppn;
+    entry->valid = 1;
     printf("Replaced way %d\n", way);
 }
 

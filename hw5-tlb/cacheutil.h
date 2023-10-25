@@ -31,8 +31,14 @@ extern tlb_set tlb_table[NUM_SETS];
 
 // Bit Helper Functions
 
-/** Get the virtual page number of the given virtual address. */
-size_t get_vpn(size_t va);
+/** Get the page number of the given virtual or physical address. */
+size_t get_page_number(size_t addr);
+
+/** Get the page address of the given page number. */
+size_t get_page_address(size_t ppn);
+
+/** Get the page offset of the given address. */
+size_t get_page_offset(size_t addr);
 
 /** Get the tag of the given virtual page number. */
 size_t get_tag(size_t vpn);

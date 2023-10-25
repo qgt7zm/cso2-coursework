@@ -11,7 +11,8 @@
 // TLB Functions
 
 void tlb_clear() {
-    memset(tlb_table, 0, NUM_SETS);
+    memset(tlb_table, 0, NUM_SETS * sizeof(tlb_set));
+    printf("Cleared TLB cache\n");
 }
 
 /**
@@ -45,7 +46,7 @@ int tlb_peek(size_t va) {
     printf("Peeking at VA 0x%lx\n", va);
 
     // Get set at index for VA
-    size_t vpn = get_vpn(va);
+    size_t vpn = get_page_number(va);
     size_t index = get_index(vpn);
     size_t tag = get_tag(vpn);
 
@@ -69,7 +70,7 @@ size_t tlb_translate(size_t va) {
     printf("Looking up VA 0x%lx\n", va);
 
     // Get set at index for VA
-    size_t vpn = get_vpn(va);
+    size_t vpn = get_page_number(va);
     size_t index = get_index(vpn);
     size_t tag = get_tag(vpn);
 
@@ -80,10 +81,12 @@ size_t tlb_translate(size_t va) {
     tlb_set *set = get_set(index);
     int way = get_way(set, tag);
 
+    size_t pa;
     size_t ppn;
     if (way == -1) {
         // VPN is not present
-        ppn = translate(va);
+        pa = translate(va);
+        ppn = get_page_number(pa);
 
         if (set->size < NUM_WAYS) {
             // Add a new way if set is not full
@@ -91,21 +94,18 @@ size_t tlb_translate(size_t va) {
             way = set->size;
         } else {
             // Replace LRU way if set is full
-            int way = get_lru_way(set);
+            way = get_lru_way(set);
             replace_entry(set, way, tag, ppn);
         }
-
-        // tlb_entry *new_entry = get_entry(set, way);
-        // new_entry->valid = 1;
-        // new_entry->tag = tag;
-        // new_entry->ppn = ppn;
     } else {
         // VPN is present
         tlb_entry *entry = get_entry(set, way);
         printf("- Last used: %d\n", entry->used_order);
         ppn = entry->ppn;
+        pa = get_page_address(ppn) + get_page_offset(va);
     }
 
     update_used_order(set, way);
-    return ppn;
+    // printf("PA = 0x%lx\n", pa);
+    return pa;
 }
