@@ -10,23 +10,17 @@
 #include "cacheutil.h"
 
 void test_split_va(size_t va) {
-    printf("VA = 0x%lx\n", va);
-
+    puts("Test test address splitting:");
     size_t vpn = get_page_number(va);
-    printf("VPN = 0x%lx\n", vpn);
-
-    size_t tag = get_tag(vpn);
-    printf("Tag = 0x%lx\n", tag);
-
-    size_t index = get_index(vpn);
-    printf("Index = 0x%lx\n", index);
-
-    size_t offset = get_page_offset(va);
-    printf("Offset = 0x%lx\n", offset);
+    assert(vpn == 0xabc);
+    assert(get_tag(vpn) == 0xab);
+    assert(get_index(vpn) == 0xc);
+    assert( get_page_offset(va) == 0x123);
+    puts("");
 }
 
 void test1() {
-    puts("Test example:");
+    puts("Test example 1:");
     tlb_clear();
     assert(tlb_peek(0) == 0);
     assert(tlb_translate(0) == 0x0020000);
@@ -127,7 +121,7 @@ int main(int argc, char *argv[]) {
     test1();
     example1();
     example2();
-    // example3();
+    example3();
 
     printf("Program completed.\n");
     return 0;

@@ -86,6 +86,10 @@ size_t tlb_translate(size_t va) {
     if (way == -1) {
         // VPN is not present
         pa = translate(va);
+        if (pa == -1) {
+            return -1; // Don't update if VA is invalid
+        }
+
         ppn = get_page_number(pa);
 
         if (set->size < NUM_WAYS) {
@@ -106,6 +110,5 @@ size_t tlb_translate(size_t va) {
     }
 
     update_used_order(set, way);
-    // printf("PA = 0x%lx\n", pa);
     return pa;
 }
