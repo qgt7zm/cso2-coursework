@@ -1,19 +1,16 @@
 CC = clang
-CFLAGS = ""
-LDFLAGS = "-O2 -lpthread"
 
-exec := dp
+execs := dp dp-arb
 
-all: $(exec)
-	./$(exec)
+all: $(execs)
 
-$(exec): dp.o
-	$(CC) $(LDFLAGS) -o $@ $^
+dp: dp.c
+	$(CC) -O2 -lpthread -fsanitize=thread -o $@ $^
 
-.c.o:
-	$(CC) $(CFLAGS) -o $@ -c $<
+dp-arb: dp-arb.c
+	$(CC) -O2 -lpthread -fsanitize=thread -o $@ $^
 
 .PHONY: clean all
 
 clean:
-	rm $(exec) *.o
+	rm $(execs) *.o
