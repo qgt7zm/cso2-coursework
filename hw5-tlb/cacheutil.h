@@ -13,16 +13,18 @@
 
 // Structs
 
-struct tlb_entry {
+typedef struct {
     int valid;
     size_t tag;
     size_t ppn;
     int used; // how recently way was used
-};
+} tlb_entry;
 
-struct tlb_set {
-    struct tlb_entry ways[NUM_WAYS];
-};
+// typedef tlb_entry tlb_set[NUM_WAYS];
+
+typedef struct {
+    tlb_entry ways[NUM_WAYS];
+} tlb_set;
 
 // Functions
 
