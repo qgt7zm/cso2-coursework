@@ -1,2 +1,5 @@
 # Executable files
 netlab
+
+# Static Libraries
+!libnetsim.a
