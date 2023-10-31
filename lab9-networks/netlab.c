@@ -8,20 +8,33 @@ int msg_total = 0; // Number of messages expected
 int callback_id; // Callback for rerequest function
 
 // Function Prototypes
+char get_checksum(int len, char *data);
 void send_get();
 void send_ack();
 void rerequest(void *args);
 
 // Helper Functions
 
+char get_checksum(int len, char *data) {
+    int start = 1;
+
+    char checksum = data[start];
+    for (int i = start + 1; i < len; i++) {
+        checksum ^= data[i];
+    }
+    return checksum;
+}
+
 void send_get() {
+    int len = 5;
+
     char data[5];
     data[1] = 'G';
     data[2] = 'E';
     data[3] = 'T';
     data[4] = level;
-    
-    char checksum = data[1] ^ data[2] ^ data[3] ^ data[4];
+
+    char checksum = get_checksum(len, data);
     data[0] = checksum; 
     // printf("Data = %s\n", data);
     send(5, data);
@@ -29,14 +42,16 @@ void send_get() {
 }
 
 void send_ack() {
-    char msg[6];
+    int len = 5;
+
+    char msg[len];
     msg[1] = 'A';
     msg[2] = 'C';
     msg[3] = 'K';
     msg[4] = (char) msg_count;
     // printf("Reply = %s\n", msg);
 
-    char checksum = msg[1] ^ msg[2] ^ msg[3] ^ msg[4];
+    char checksum = get_checksum(len, msg);
     msg[0] = checksum;
     send(5, msg);
 
@@ -60,14 +75,25 @@ void recvd(size_t len, void* _data) {
     char *data = _data;
     // printf("Received message %d = %s\n", msg_count, data);
 
-    // char checksum = data[0];
+    // Check if message is corrupted
+    // char real_checksum = data[0];
+    // char actual_checksum = get_checksum(len, data);
+    // printf("Checksums: %d, %d\n", real_checksum, actual_checksum);
+
+    // if (real_checksum != actual_checksum) {
+        // Rerequest message
+	// rerequest(NULL); 
+	// return;
+    // }
+
+    // Received correct message
+
     // char msg_count = data[1];
     if (msg_total == 0) {
         msg_total = (int) data[2];
     }
     fwrite(data+3,1,len-3,stdout);
     fflush(stdout);
-
     msg_count += 1;
 
     if (msg_count < msg_total) {
@@ -87,7 +113,5 @@ int main(int argc, char *argv[]) {
     // end of working code
     
     send_get();
-    // FIX ME -- add action if no reply
-
     waitForAllTimeouts();
 }
