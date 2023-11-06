@@ -1,0 +1,4 @@
+# Executable files
+life
+life-asan
+life-tsan
