@@ -5,13 +5,36 @@
 #include <errno.h>
 
 // computes the geometric mean of a set of values.
-// You should use OpenMP to make faster versions of this.
-// Keep the underlying sum-of-logs approach.
+// Task Queue + Many-to-few Reduction approach
 double geomean(unsigned char *s, size_t n) {
     double answer = 0;
-    for(int i=0; i<n; i+=1) {
-        if (s[i] > 0) answer += log(s[i]) / n;
+    int j = 0; // shared counter
+
+    // run the while loop in parallel
+    # pragma omp parallel
+    {
+        double local_answer = 0; // keep a local result
+        while (1) {
+            int i;
+
+	    // run the operation atomically
+            # pragma omp atomic capture
+	    i = j++;
+	    if (i >= n) break;
+
+            # pragma omp nowait
+            if (s[i] > 0) {
+	        // run the operation atomically
+	        # pragma omp atomic update
+	        local_answer += log(s[i]) / n;
+	    }	
+	}
+
+	// run the operation atomically
+        # pragma omp atomic update
+	answer += local_answer;
     }
+
     return exp(answer);
 }
 
@@ -51,6 +74,6 @@ int main(int argc, char *argv[]) {
     free(s);
 
     // step 3: report result
-    printf("Strategy: Non-parallel\n");
+    printf("Strategy: Task queue + many-to-few reduction\n");
     printf("%lld ns to process %zd characters: %g\n\n", t1-t0, n, answer);
 }
