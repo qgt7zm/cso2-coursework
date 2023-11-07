@@ -33,14 +33,7 @@ int main(int argc, char *argv[]) {
     size_t n;
     char *s = read_file(argc, argv, &n);
 
-    // step 2: invoke and time the geometric mean function
-    long long t0 = nsecs();
-    double answer = geomean((unsigned char*) s,n);
-    long long t1 = nsecs();
-
-    free(s);
-
-    // step 3: report result
-    printf("Strategy: Even split + many-to-few reduction\n");
-    printf("%lld ns to process %zd characters: %g\n\n", t1-t0, n, answer);
+    // Step 2: invoke and time the geometric mean function
+    // Step 3: report result
+    run_time_trial(s, n, "Even split + many-to-few");
 }

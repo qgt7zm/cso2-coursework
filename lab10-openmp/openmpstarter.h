@@ -3,6 +3,9 @@
 #include <time.h> // struct timespec, clock_gettime, CLOCK_REALTIME
 #include <errno.h>
 
+#ifndef OPENMPSTARTER_H
+#define OPENMPSTARTER_H
+
 // Computes the geometric mean of a set of values.
 // You should use OpenMP to make faster versions of this.
 // Keep the underlying sum-of-logs approach.
@@ -15,7 +18,7 @@ long long nsecs() {
     return t.tv_sec*1000000000 + t.tv_nsec;
 }
 
-// Read the file specified at arg1 and sets the length
+// Read the files specified in argv and sets the length
 char *read_file(int argc, char *argv[], size_t *n) {
     char *s = NULL;
     *n = 0;
@@ -36,3 +39,24 @@ char *read_file(int argc, char *argv[], size_t *n) {
     }
     return s;
 }
+
+void run_time_trial(char *s, size_t n, char *strategy) {
+    // Time the function
+    long long t0 = nsecs();
+    double answer = geomean((unsigned char*) s, n);
+    long long t1 = nsecs();
+    free(s);
+
+    // Print results
+    long long time = t1 - t0;
+
+    printf("Strategy: %s\n", strategy);
+    printf("Time: %lld ms, ", time);
+    printf("Characters: %zd, ", n);
+    printf("Result: %g\n", answer);
+    
+    // printf("%lld ns to process %zd characters: %g\n\n", t1 - t0, n, answer);
+    puts("");
+}
+
+#endif

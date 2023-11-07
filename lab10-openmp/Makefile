@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS = -fopenmp -O2
-# CFLAGS = -O2
+# CFLAGS = -fopenmp -O2
+CFLAGS = -O2
 LDFLAGS = -lm
 
 header := openmpstarter.h
 execs := main_np main_p11 main_p12 main_p21 main_p22
-arg1 := "/usr/bin/emacs-gtk"
-# arg1 := "./Makefile"
+# arg1 := "/usr/bin/emacs-gtk"
+arg1 := "./Makefile"
 
 all: $(execs)
 	./main_np $(arg1)
