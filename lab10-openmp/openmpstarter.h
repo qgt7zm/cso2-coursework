@@ -48,10 +48,10 @@ void run_time_trial(char *s, size_t n, char *strategy) {
     free(s);
 
     // Print results
-    long long time = t1 - t0;
+    long double time = (t1 - t0) / 1000000.0;
 
     printf("Strategy: %s\n", strategy);
-    printf("Time: %lld ms, ", time);
+    printf("Time: %.4Lf ms, ", time);
     printf("Characters: %zd, ", n);
     printf("Result: %g\n", answer);
     
