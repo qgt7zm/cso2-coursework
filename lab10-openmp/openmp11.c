@@ -1,5 +1,3 @@
-#include <stddef.h>
-#include <stdio.h> // fopen, fread, fclose, printf, fseek, ftell
 #include <math.h> // log, exp
 #include <stdlib.h> // free, realloc
 
@@ -12,9 +10,9 @@ double geomean(unsigned char *s, size_t n) {
     # pragma omp parallel for
     for(int i=0; i<n; i+=1) {
         if (s[i] > 0) {
-	    // run the operation atomically
-	    # pragma omp atomic update
-	    answer += log(s[i]) / n;
+            // run the operation atomically
+            # pragma omp atomic update
+            answer += log(s[i]) / n;
         }
     }
     return exp(answer);

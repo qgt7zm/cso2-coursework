@@ -1,5 +1,3 @@
-#include <stddef.h>
-#include <stdio.h> // fopen, fread, fclose, printf, fseek, ftell
 #include <math.h> // log, exp
 #include <stdlib.h> // free, realloc
 

@@ -1,5 +1,3 @@
-#include <stddef.h>
-#include <stdio.h> // fopen, fread, fclose, printf, fseek, ftell
 #include <math.h> // log, exp
 #include <stdlib.h> // free, realloc
 
@@ -17,10 +15,10 @@ double geomean(unsigned char *s, size_t n) {
         while (1) {
             int i;
 
-	    // run the operation atomically
+	        // run the operation atomically
             # pragma omp atomic capture
-	    i = j++;
-	    if (i >= n) break;
+	        i = j++;
+	        if (i >= n) break;
 
             # pragma omp nowait
             if (s[i] > 0) {
