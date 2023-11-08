@@ -12,6 +12,5 @@ netlab: netlab.o
 %.o : %.c netsim.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-
 clean:
 	rm -f *.o netlab
