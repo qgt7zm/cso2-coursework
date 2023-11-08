@@ -1,0 +1,16 @@
+Lab 10: OpenMP
+
+00 (Non-parallel): 2nd Fastest
+- No atomic operations, but long loop
+
+11 (Even Split + Atomic): 3rd Slowest
+- Only 1 atomic operation for Atomic, but threads need to wait for each other
+
+12 (Even Split + Many-few): Fastest*
+- Only 1 atomic operation for Many-few, but threads don’t need to wait for each other to finish
+
+21 (Task Queue + Atomic): Slowest*
+- Queue + Atomic both have 1 atomic operation, each, need to wait a lot
+
+22 (Task Queue + Many-few): 2nd Slowest
+- Still 2 atomic operations, but nowait means threads can move on early
