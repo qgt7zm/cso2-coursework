@@ -1,27 +1,27 @@
 #include "life.h"
 #include <pthread.h>
 
-struct life_info {
+typedef struct {
     pthread_barrier_t barrier;
     int steps;
     int threads;
     int threads_completed;
     LifeBoard *state;
     LifeBoard *next_state;
-};
+} GameInfo;
 
 void *life_threaded(void *arg) {
-    struct life_info *info = (struct life_info *) arg;
+    GameInfo *game = (GameInfo *) arg;
 
-    for (int step = 0; step < info->steps; step++) {
-        printf("- Waiting step %d\n", step);
-        info->threads_completed += 1;
-        pthread_barrier_wait(&info->barrier);
+    for (int step = 0; step < game->steps; step++) {
+        printf("Waiting step %d\n", step);
+        game->threads_completed += 1;
+        pthread_barrier_wait(&game->barrier);
 
-        if (info->threads_completed == info->threads) {
-            LB_swap(info->state, info->next_state);
-            info->threads_completed = 0;
-            puts("Swapped states");
+        if (game->threads_completed == game->threads) {
+            LB_swap(game->state, game->next_state);
+            game->threads_completed = 0;
+            printf("Finished step %d\n\n", step);
         }   
     }
     return NULL;
@@ -29,26 +29,26 @@ void *life_threaded(void *arg) {
 
 void simulate_life_parallel(int threads, LifeBoard *state, int steps) {
     // Create the barrier
-    struct life_info info;
-    pthread_barrier_init(&info.barrier, NULL, threads);
+    GameInfo game;
+    pthread_barrier_init(&game.barrier, NULL, threads);
 
     // Partition the board roughly evenly
     int slice_width = state->width / threads;
     if (slice_width == 0) slice_width = 1;
 
     // Step up the function argument
-    info.steps = steps;
+    game.steps = steps;
+    game.threads = threads;
+    game.threads_completed = 0;
+
     LifeBoard *next_state = LB_new(state->width, state->height); // Save the state of the next step
-    info.next_state = next_state;
-    info.threads = threads;
-    info.threads_completed = 0;
-    info.state = state;
-    info.next_state = next_state;
+    game.state = state;
+    game.next_state = next_state;
 
     // Create all threads and run the game
     pthread_t game_threads[threads];
     for (int i = 0; i < threads; i++) {
-	    pthread_create(&game_threads[i], NULL, life_threaded, (void *) &info);
+	    pthread_create(&game_threads[i], NULL, life_threaded, (void *) &game);
     }
 
     // Delete all threads
@@ -57,6 +57,6 @@ void simulate_life_parallel(int threads, LifeBoard *state, int steps) {
     }
 
     // Free all resources
-    pthread_barrier_destroy(&info.barrier);
+    pthread_barrier_destroy(&game.barrier);
     LB_del(next_state);
 }
