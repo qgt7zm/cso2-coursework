@@ -22,7 +22,7 @@ typedef struct {
 
 // Helper Functions
 
-GameInfo *Game_create(int steps, int threads) {
+GameInfo *Game_create(int steps, int threads, pthread_barrier_t *barrier) {
     GameInfo *game = calloc(1, sizeof(GameInfo));
 
     // Initialize fields
@@ -30,9 +30,8 @@ GameInfo *Game_create(int steps, int threads) {
     game->threads = threads;
 
     // Create the barrier
-    pthread_barrier_t barrier;
-    pthread_barrier_init(&barrier, NULL, threads);
-    game->barrier = &barrier;
+    pthread_barrier_init(barrier, NULL, threads);
+    game->barrier = barrier;
 
     return game;
 }
@@ -46,6 +45,7 @@ void Game_delete(GameInfo *game) {
 ThreadInfo *Thread_create(int thread_id, GameInfo *game, int startX, int endX) {
     ThreadInfo *thread = calloc(1, sizeof(ThreadInfo));
 
+    // Initialize fields
     thread->thread_id = thread_id;
     thread->game = game;
     thread->startX = startX;
@@ -84,17 +84,24 @@ void partition_board(int board_width, int threads, int starts[], int ends[]) {
 }
 
 void *life_threaded(void *arg) {
-    // GameInfo *game = (GameInfo *) arg;
-
     ThreadInfo *thread = (ThreadInfo *) arg;
     GameInfo *game = thread->game;
     LifeBoard *state = game->state;
     LifeBoard *next_state = game->next_state;
     // printf("Slice %d: [%d, %d)\n", thread->thread_id, thread->startX, thread->endX);
 
-    for (int step = 0; step < game->steps; step++) {
-        for (int y = 1; y < state->height - 1; y++) {
-            for (int x = thread->startX; x < thread->endX && x < state->width - 1; x++) {
+    const int steps = game->steps;
+    const int width = state->width;
+    const int height = state->height;
+
+    const int startX = thread->startX;
+    const int endX = thread->endX;
+
+    pthread_barrier_wait(game->barrier);
+
+    for (int step = 0; step < steps; step++) {
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = startX; x < endX && x < width - 1; x++) {
                 // printf("- Slice %d, Cell (%d, %d)\n", thread->thread_id, x, y);
 
                 // Count live neighbors
@@ -105,7 +112,6 @@ void *life_threaded(void *arg) {
                             live_in_window += 1;
                 
                 // Set next state
-                // TODO race condition
                 LB_set(next_state, x, y,
                     live_in_window == 3 /* dead cell with 3 neighbors or live cell with 2 */ ||
                     (live_in_window == 4 && LB_get(state, x, y)) /* live cell with 3 neighbors */
@@ -132,11 +138,11 @@ void *life_threaded(void *arg) {
 
 void simulate_life_parallel(int threads, LifeBoard *state, int steps) {
     // Create the game argument
-    GameInfo *game = Game_create(steps, threads);
+    pthread_barrier_t barrier;
+    GameInfo *game = Game_create(steps, threads, &barrier);
 
     game->state = state;
     game->next_state = LB_new(state->width, state->height); // Save the state of the next step
-
 
     // Partition the board roughly evenly
     int starts[threads];
