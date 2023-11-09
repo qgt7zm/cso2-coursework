@@ -4,3 +4,4 @@
 clear
 make
 ./life 5 input/tiny time-and-result
+# ./life 75 input/o0075 time-and-result
