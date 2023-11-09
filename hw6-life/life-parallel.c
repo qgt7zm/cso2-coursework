@@ -7,9 +7,9 @@
 
 typedef struct {
     pthread_barrier_t *barrier;
+    pthread_mutex_t *lock;
     int steps;
     int threads;
-    int threads_completed; // How many theads completed this step
     LifeBoard *state;
     LifeBoard *next_state;
 } GameInfo;
@@ -29,12 +29,17 @@ GameInfo *Game_create(int steps, int threads) {
     // Initialize
     game->steps = steps;
     game->threads = threads;
-    game->threads_completed = 0;
+
 
     // Create the barrier
     pthread_barrier_t barrier;
     pthread_barrier_init(&barrier, NULL, threads);
     game->barrier = &barrier;
+
+    // Create the lock
+    pthread_mutex_t lock;
+    pthread_mutex_init(&lock, NULL);
+    game->lock = &lock;
 
     return game;
 }
@@ -105,6 +110,7 @@ void *life_threaded(void *arg) {
                             live_in_window += 1;
                 
                 // Set next state
+                // TODO race condition
                 LB_set(next_state, x, y,
                     live_in_window == 3 /* dead cell with 3 neighbors or live cell with 2 */ ||
                     (live_in_window == 4 && LB_get(state, x, y)) /* live cell with 3 neighbors */
@@ -113,16 +119,21 @@ void *life_threaded(void *arg) {
             }
         }
 
-        // printf("Thread %d done\n", thread->thread_id);
-        game->threads_completed += 1;
+        // Wait until all threads are done
         pthread_barrier_wait(game->barrier);
 
-        if (game->threads_completed == game->threads) {
+        // Have first thread swap states
+        pthread_mutex_lock(game->lock);
+        if (thread->thread_id == 0) {
             LB_swap(game->state, game->next_state);
-            game->threads_completed = 0;
-            // printf("Finished step %d\n\n", step);
-        }   
+            // printf("Finished step %d\n", step);
+        }
+        pthread_mutex_unlock(game->lock);
+        
+        // Don't continue until states swapped
+        pthread_barrier_wait(game->barrier);
     }
+
     return NULL;
 }
 
