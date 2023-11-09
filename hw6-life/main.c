@@ -45,8 +45,8 @@ vfv test_functions[] = {
     serial,
     threads_1,
     threads_2,
-    // threads_4,
-    // threads_8,
+    threads_4,
+    threads_8,
 };
 /** Display names for functions (must match above array) */
 const char *function_names[] = {

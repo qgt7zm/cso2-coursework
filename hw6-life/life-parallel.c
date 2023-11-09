@@ -7,7 +7,6 @@
 
 typedef struct {
     pthread_barrier_t *barrier;
-    pthread_mutex_t *lock;
     int steps;
     int threads;
     LifeBoard *state;
@@ -26,20 +25,14 @@ typedef struct {
 GameInfo *Game_create(int steps, int threads) {
     GameInfo *game = calloc(1, sizeof(GameInfo));
 
-    // Initialize
+    // Initialize fields
     game->steps = steps;
     game->threads = threads;
-
 
     // Create the barrier
     pthread_barrier_t barrier;
     pthread_barrier_init(&barrier, NULL, threads);
     game->barrier = &barrier;
-
-    // Create the lock
-    pthread_mutex_t lock;
-    pthread_mutex_init(&lock, NULL);
-    game->lock = &lock;
 
     return game;
 }
@@ -52,10 +45,12 @@ void Game_delete(GameInfo *game) {
 
 ThreadInfo *Thread_create(int thread_id, GameInfo *game, int startX, int endX) {
     ThreadInfo *thread = calloc(1, sizeof(ThreadInfo));
+
     thread->thread_id = thread_id;
     thread->game = game;
     thread->startX = startX;
     thread->endX = endX;
+    
     return thread;
 }
 
@@ -123,12 +118,10 @@ void *life_threaded(void *arg) {
         pthread_barrier_wait(game->barrier);
 
         // Have first thread swap states
-        pthread_mutex_lock(game->lock);
         if (thread->thread_id == 0) {
             LB_swap(game->state, game->next_state);
             // printf("Finished step %d\n", step);
         }
-        pthread_mutex_unlock(game->lock);
         
         // Don't continue until states swapped
         pthread_barrier_wait(game->barrier);
