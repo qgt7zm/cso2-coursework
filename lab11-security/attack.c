@@ -27,7 +27,7 @@ void forward_attack_1(struct message *message) {
 
         // Send different message
         struct message *new_msg = new_message(
-            'A', 'B', new_text, 1, 0
+            'A', 'B', new_text, true, false
         );
         send_message(new_msg);
     } else {
@@ -39,14 +39,33 @@ void forward_attack_1(struct message *message) {
    change this code to implement your attack
  */
 void forward_attack_2(struct message *message) {
+    // Replay the message
+    send_message(message);
     send_message(message);
 }
+
+static int counter = 0;
 
 /* forward function for "attack 3" case.
    change this code to implement your attack
  */
 void forward_attack_3(struct message *message) {
-    send_message(message);
+    if (message->from == 'A') {
+        counter += 1;
+
+        if (counter == 1) {
+            // Send the first message once
+            send_message(message);
+        } else if (counter == 2) {
+            // Send the second message twice
+            send_message(message);
+            send_message(message);
+        }
+        // Don't send the third message
+        
+    } else {
+        send_message(message);
+    }
 }
 
 /* forward function for "attack 4" case.
