@@ -33,14 +33,32 @@ void find_passphrase(char *buffer, int length) {
     memset(buffer, '\0', length);
     result = 0;
 
-    for (int i = 0; i < NUM_LETTERS; i++) {
-        char next_char = FIRST_LETTER + i;
-        buffer[0] = next_char;
-        long time_for_a = measure_once(&result, buffer, check_passphrase);
-        printf("'%c' took %ld cycles\n", next_char, time_for_a);
-        if (result == 1) {
-            // Found correct passphrase, done
-            return;
+    // Time each letter and find the max
+    for (int j = 0; j < length; j++) {
+        long maxTime = 0;
+        int maxIdx = -1;
+        for (int i = 0; i < NUM_LETTERS; i++) {
+            buffer[j] = FIRST_LETTER + i;
+            long timing = measure_once(&result, buffer, check_passphrase);
+            // printf("'%s' took %ld cycles\n", buffer, timing);
+
+            // Update max
+            if (timing > maxTime) {
+                maxTime = timing;
+                maxIdx = i;
+            }
         }
+        buffer[j] = FIRST_LETTER + maxIdx;
+        printf("'%s' took %ld cycles\n", buffer, maxTime);
+    }
+
+    // Check passphrase
+    measure_once(&result, buffer, check_passphrase);
+    if (result == 1) {
+        printf("Found correct passphrase\n");
+        return;
+    } else {
+        printf("Found incorrect passphrase\n");
+        // TODO retry
     }
 }
