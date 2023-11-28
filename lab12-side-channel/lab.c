@@ -6,6 +6,8 @@
 // Constants
 #define NUM_LETTERS 26
 #define FIRST_LETTER 'a'
+#define NUM_TRIALS 10
+#define MAX_RETRY 5
 
 /* When complete, this function should fill in "buffer"
  * with a length-character \0-termianted string such that
@@ -24,32 +26,35 @@
  */
 void find_passphrase(char *buffer, int length) {
     // Warm up the processor
-    memset(buffer, 'c', length);
+    memset(buffer, FIRST_LETTER, length);
     int result;
     for (int i = 0; i < 10; i++) {
         measure_once(&result, buffer, check_passphrase);
     }
 
     memset(buffer, '\0', length);
-    result = 0;
 
     // Time each letter and find the max
-    for (int j = 0; j < length; j++) {
-        long maxTime = 0;
+    for (int i = 0; i < length; i++) {
+        long maxTiming = 0;
         int maxIdx = -1;
-        for (int i = 0; i < NUM_LETTERS; i++) {
-            buffer[j] = FIRST_LETTER + i;
-            long timing = measure_once(&result, buffer, check_passphrase);
-            // printf("'%s' took %ld cycles\n", buffer, timing);
+        for (int j = 0; j < NUM_LETTERS; j++) {
+            buffer[i] = FIRST_LETTER + j;
+            // Find the total after multiple trials
+            long timing = 0;
+            for (int k = 0; k < NUM_TRIALS; k++) {
+                timing += measure_once(&result, buffer, check_passphrase);
+                // printf("'%s' took %ld cycles\n", buffer, timing / NUM_TRIALS);
+            }
 
             // Update max
-            if (timing > maxTime) {
-                maxTime = timing;
-                maxIdx = i;
+            if (timing > maxTiming) {
+                maxTiming = timing;
+                maxIdx = j;
             }
         }
-        buffer[j] = FIRST_LETTER + maxIdx;
-        printf("'%s' took %ld cycles\n", buffer, maxTime);
+        buffer[i] = FIRST_LETTER + maxIdx;
+        printf("'%s' took %ld cycles\n", buffer, maxTiming / NUM_TRIALS);
     }
 
     // Check passphrase
