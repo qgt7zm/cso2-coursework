@@ -39,7 +39,7 @@ void find_passphrase(char *buffer, int length) {
     
     for (int i = 1; i <= MAX_GUESSES; i++) {
         guess_passphrase(buffer, length);
-        // check passphrase
+        // Check passphrase
         measure_once(&result, buffer, check_passphrase);
         if (result == 1) {
             printf("Found correct passphrase after %d tries\n\n", i);
